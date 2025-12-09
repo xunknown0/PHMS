@@ -1,0 +1,75 @@
+/* --- PHMS Theme Variables for Cards --- */
+:root {
+  --phms-primary-green: #284d3b;
+  --phms-dark-primary: #1a3627;
+  --phms-golden-accent: #c9b078;
+  --phms-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.phms-card-dark {
+  background-color: var(--phms-primary-green);
+  color: white;
+  border: 1px solid var(--phms-dark-primary);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.phms-card-dark:hover {
+  transform: translateY(-5px); /* Slight lift on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+.phms-card-dark .card-title {
+  color: var(--phms-golden-accent); /* Golden accent for titles */
+  font-weight: 700;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.phms-card-dark .card-text {
+  font-size: 0.95rem;
+  opacity: 0.85;
+}
+
+/* Custom button that contrasts well with the dark card */
+.btn-outline-golden {
+  color: var(--phms-golden-accent);
+  border-color: var(--phms-golden-accent);
+  background-color: transparent;
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-outline-golden:hover {
+  background-color: var(--phms-golden-accent);
+  color: var(--phms-dark-primary); /* Dark text on hover */
+  border-color: var(--phms-golden-accent);
+}
+
+
+.pagination-success .page-link {
+  color: #198754;
+  border-color: #198754;
+}
+
+.pagination-success .page-link:hover {
+  background-color: #198754;
+  color: white;
+}
+
+.pagination-success .active .page-link {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+
+.btn-outline-phms-green {
+  color: #198754;
+  border-color: #198754;
+}
+
+.btn-outline-phms-green:hover {
+  background-color: #198754;
+  color: #fff;
+}

@@ -1,0 +1,114 @@
+/* =======================================
+   1. ROOT VARIABLES & GLOBAL STYLES
+   ======================================= */
+:root {
+    /* Theme Colors: Deep Forest Green & Soft Gold/Khaki */
+    --phms-blue: #284d3b;     /* Primary: Deep Forest Green (Nav/Sidebar BG) */
+    --phms-dark-blue: #1a3627;  /* Secondary: Very Dark Green/Teal (Hover/Accent BG) */
+    --phms-golden: #c9b078;   /* Accent: Soft Gold/Khaki (Links/Text) */
+
+    /* Bootstrap variable override for better integration */
+    --bs-gray-700: #495057;   /* Re-defining or using an appropriate dark gray for dropdown hover */
+}
+
+/* Custom Class for Golden Text */
+.phms-golden-text {
+    color: var(--phms-golden) !important;
+}
+
+/* =======================================
+   2. NAVBAR STRUCTURE & POSITIONING
+   ======================================= */
+
+/* Fix Navbar to Top and Define Background */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; 
+    background-color: var(--phms-blue);
+    padding: 0.75rem 1rem;
+}
+
+/* Prevent overlap with fixed navbar */
+body {
+    /* Set min height/style in main CSS file */
+    padding-top: 70px; 
+}
+
+
+/* =======================================
+   3. NAVIGATION LINKS
+   ======================================= */
+
+.navbar-nav .nav-link {
+    color: var(--phms-golden) !important;
+    position: relative;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Define common hover state for consistency and reduced repetition */
+.navbar-nav .nav-link:hover {
+    color: var(--phms-golden) !important; 
+    transform: translateY(-2px) scale(1.05);
+}
+
+.navbar-nav .nav-link.active {
+    /* Use a contrasting color for the active link */
+    color: white !important;
+}
+
+/* =======================================
+   4. DROPDOWN MENU
+   ======================================= */
+
+.dropdown-menu {
+    border-radius: 0.5rem;
+    border: none;
+    padding: 0.5rem 0;
+}
+
+.dropdown-menu .dropdown-item {
+    color: var(--phms-golden) !important;
+    padding: 0.75rem 1rem;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.dropdown-menu .dropdown-item:hover {
+    /* Use the dark-blue variable for consistency if applicable, 
+       otherwise the specified gray is fine */
+    background-color: var(--bs-gray-700); 
+    color: var(--phms-golden) !important;
+}
+
+/* =======================================
+   5. CUSTOM BUTTON STYLES
+   ======================================= */
+
+.btn-phms-primary {
+    background-color: var(--phms-blue); 
+    border-color: var(--phms-golden); 
+    color: var(--phms-golden) !important;
+    font-weight: 600; 
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.btn-phms-primary:hover, .btn-phms-primary:focus {
+    background-color: var(--phms-dark-blue); 
+    border-color: white;
+    color: white !important;
+    /* Using Bootstrap utility for box shadow on focus/hover */
+    box-shadow: 0 0 0 0.25rem rgba(201, 176, 120, 0.4);
+}
+
+/* =======================================
+   6. RESPONSIVE / MOBILE ADJUSTMENTS
+   ======================================= */
+
+@media (max-width: 991px) {
+    /* Adds top margin to the right-aligned nav items (user info/logout) when collapsed */
+    .navbar-nav.ms-auto {
+        margin-top: 1rem;
+    }
+}

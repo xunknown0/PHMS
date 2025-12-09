@@ -1,0 +1,87 @@
+<link rel="stylesheet" href="/stylesheets/navbar.css">
+
+<nav class="navbar navbar-expand-lg shadow-lg" aria-label="Main PHMS Navigation">
+  <div class="container">
+    
+    <a class="navbar-brand fw-bold phms-golden-text d-flex align-items-center" href="/dashboard" aria-label="PHMS Dashboard">
+      <i class="fas fa-paw me-2 fa-lg" aria-hidden="true"></i>PHMS
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+      aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon" style="filter: invert(1);"></span> 
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link fw-medium d-flex align-items-center active" href="/dashboard" aria-current="page">
+            <i class="fas fa-home me-2" aria-hidden="true"></i>Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/owners">
+            <i class="fas fa-user-friends me-2" aria-hidden="true"></i>Owners
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link fw-medium d-flex align-items-center" href="/pets">
+            <i class="fas fa-dog me-2" aria-hidden="true"></i>Pets
+          </a>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle fw-medium d-flex align-items-center" href="#" id="boardingDropdown"
+            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-bed me-2" aria-hidden="true"></i>Boarding
+          </a>
+          <ul class="dropdown-menu shadow-lg" aria-labelledby="boardingDropdown">
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/boarding/book">
+                <i class="fas fa-calendar-plus me-2" aria-hidden="true"></i>Book Appointment
+              </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="/boarding/bookings">
+                <i class="fas fa-list-alt me-2" aria-hidden="true"></i>Booking History
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-center">
+        <li class="nav-item me-4 d-none d-lg-flex">
+          <span class="navbar-text phms-golden-text fw-semibold d-flex align-items-center" aria-label="Current Date and Time">
+            <i class="fas fa-clock me-1" aria-hidden="true"></i>
+            <span id="datetime"></span>
+          </span>
+        </li>
+        
+        <% if (user) { %>
+          <li class="nav-item me-3 d-none d-lg-block">
+            <span class="navbar-text text-white fw-semibold d-flex align-items-center">
+              <i class="fas fa-user me-1" aria-hidden="true"></i>Hello, <%= user.username %>
+            </span>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-phms-primary btn-sm px-3 rounded-pill d-flex align-items-center fw-bold" href="/logout">
+              <i class="fas fa-sign-out-alt me-1" aria-hidden="true"></i>Logout
+            </a>
+          </li>
+        <% } else { %>
+          <li class="nav-item">
+            <a class="btn btn-phms-primary btn-sm px-3 rounded-pill d-flex align-items-center fw-bold" href="/login">
+              <i class="fas fa-sign-in-alt me-1" aria-hidden="true"></i>Login
+            </a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/javascripts/navbar.js"></script>
+

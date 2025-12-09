@@ -1,0 +1,92 @@
+   :root {
+      --phms-green: #284d3b;
+      --phms-dark-green: #1a3627;
+      --phms-golden: #c9b078;
+      --phms-card-bg: #ffffff;
+      --phms-shadow: 0 15px 40px rgba(0,0,0,0.3);
+      --phms-toast-success-bg: #1a753c;
+      --phms-toast-error-bg: #be0c0c;
+    }
+
+    body {
+      background-color: #e0e8e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Login Card */
+    .login-card {
+      background-color: var(--phms-card-bg);
+      width: 100%;
+      max-width: 400px;
+      padding: 3rem;
+      border-radius: 1rem;
+      box-shadow: var(--phms-shadow);
+      text-align: center;
+      border-top: 5px solid var(--phms-green);
+    }
+
+    .login-card h2 {
+      color: var(--phms-dark-green);
+      margin-bottom: 2rem;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+
+    .form-control {
+      border-radius: 0.5rem;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ced4da;
+    }
+
+    .form-control:focus {
+      border-color: var(--phms-green);
+      box-shadow: 0 0 0 0.25rem rgba(40,77,59,0.25);
+    }
+
+    .btn-primary-phms {
+      background-color: var(--phms-green);
+      border-color: var(--phms-green);
+      color: #fff;
+      font-weight: 600;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary-phms:hover {
+      background-color: var(--phms-dark-green);
+      border-color: var(--phms-dark-green);
+      color: #fff;
+    }
+
+    .phms-golden-text {
+      color: var(--phms-golden) !important;
+    }
+
+    /* Toasts */
+    #toast-container {
+      position: fixed;
+      bottom: 0;
+      right: 0;
+      z-index: 1100;
+      padding: 1rem;
+    }
+
+    .toast.text-bg-success {
+      background-color: var(--phms-toast-success-bg) !important;
+      color: #fff !important;
+      border: none;
+      text-align: center;
+    }
+
+    .toast.text-bg-danger {
+      background-color: var(--phms-toast-error-bg) !important;
+      color: #fff !important;
+      border: none;
+      text-align: center;
+
+    }

@@ -1,0 +1,285 @@
+<% layout('layouts/boilerplate') -%>
+<%
+  // --- Initial Variables (Robust Check) ---
+  const errors  = (typeof errorsList !== "undefined") ? errorsList : [];
+  const old     = (typeof oldData !== "undefined") ? oldData : {};
+  const success = (typeof successMessage !== "undefined") ? successMessage : "";
+
+  const ownersArray = (typeof owners !== "undefined" && Array.isArray(owners)) ? owners : [];
+
+  const currentSearch     = (typeof search !== "undefined") ? search : "";
+  const currentPageNumber = Number((typeof page !== "undefined") ? page : 1);
+  const currentTotalPages = Number((typeof totalPages !== "undefined") ? totalPages : 1);
+  const currentLimit      = Number((typeof limit !== "undefined") ? limit : 6);
+
+  // Helper function for creating pagination links
+  const createPageLink = (page) => `/owners?page=${page}&search=${currentSearch}&limit=${currentLimit}`;
+%>
+
+
+<% if (success) { %>
+  <div class="alert alert-success alert-dismissible fade show shadow-sm border-0" role="alert">
+    <i class="fas fa-check-circle me-2"></i> <strong>Success:</strong> <%= success %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<% if (errors.length) { %>
+  <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+    <i class="fas fa-exclamation-triangle me-2"></i> <strong>Validation Error:</strong> 
+    <% errors.forEach(err => { %>
+      <div><%= err.msg || err %></div>
+    <% }) %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<% } %>
+
+<header class="d-flex justify-content-between align-items-center mb-2 pb-3 border-bottom">
+  <div>
+    <h1 class="display-6 fw-bold mb-1 text-dark fs-3">
+      <i class="fas fa-address-book me-2 text-success"></i> Owners Contact List
+    </h1>
+    <p class="text-muted fs-6 mb-0">View and manage owner profiles in a card-based layout.</p>
+  </div>
+
+<button
+  type="button"
+  class="btn btn-success fw-bold text-uppercase px-4 shadow-sm"
+  data-bs-toggle="modal"
+  data-bs-target="#addOwnerModal"
+  title="Add a New Owner Record"
+>
+  <i class="fas fa-plus me-2"></i> New Owner
+</button>
+</header>
+
+<%- include('./ownerModal/addOwnerModal', { errorsList: errors, oldData: old }) %>
+<% ownersArray.forEach(owner => { %>
+  <%- include('./ownerModal/editOwnerModal', { owner }) %>
+  <%- include('./ownerModal/viewProfileImage', { owner }) %>
+<% }) %>
+
+
+<div class="card shadow-lg rounded-4 border-0">
+  <div class="card-body p-4">
+
+    <div class="p-3 mb-4 rounded-3 bg-light border shadow-sm">
+      <div class="row align-items-center g-3">
+        <div class="col-12 col-lg-9">
+          <form id="searchForm" method="GET" action="/owners" class="d-flex align-items-center gap-3">
+            
+            <div class="input-group input-group-sm" style="width: 120px;">
+              <label class="input-group-text bg-white border-end-0 text-muted fw-medium d-none d-sm-flex" for="limit">Show</label> 
+              <select 
+                name="limit" 
+                id="limit" 
+                class="form-select border-start-0" 
+                onchange="document.getElementById('searchForm').submit()"
+              >
+                <% [6, 9,12].forEach(limitVal => { %>
+                  <option value="<%= limitVal %>" <%= currentLimit == limitVal ? 'selected' : '' %>>
+                    <%= limitVal %>
+                  </option>
+                <% }) %>
+              </select>
+            </div>
+
+            <div class="input-group shadow-sm flex-grow-1 rounded-pill overflow-hidden bg-white">
+              <span class="input-group-text bg-white border-0">
+                <i class="fas fa-search text-secondary"></i>
+              </span>
+              <input
+                name="search"
+                type="search"
+                class="form-control border-0" 
+                placeholder="Search by name, ID, or phone..."
+                value="<%= currentSearch %>"
+              />
+              <button class="btn btn-success" type="submit">Search</button>
+            </div>
+
+            <% if (currentSearch) { %>
+              <a href="/owners?limit=<%= currentLimit %>" class="btn btn-outline-danger ms-0 rounded-pill" title="Clear Search">
+                <i class="fas fa-times"></i>
+              </a>
+            <% } %>
+
+            <input type="hidden" name="page" value="1">
+          </form>
+        </div>
+
+        <div class="col-12 col-lg-3 text-lg-end">
+          <small id="recordCountDisplay" class="text-muted fw-medium d-block text-center text-lg-end">
+            <i class="fas fa-list-alt me-1"></i> Page <strong><%= currentPageNumber %></strong> of <strong><%= currentTotalPages %></strong>
+            <% if (currentSearch) { %>
+              <span class="text-primary ms-1 fst-italic fw-bold">(Filtered)</span>
+            <% } %>
+          </small>
+        </div>
+      </div>
+    </div>
+    
+    <% if (!ownersArray.length) { %>
+      <div class="py-5 text-center text-muted fst-italic bg-white border rounded-3">
+        <i class="fas fa-exclamation-circle me-2"></i> No owner records found 
+        <%= currentSearch ? 'matching "' + currentSearch + '".' : '. Start by registering a new owner.' %>
+      </div>
+    <% } else { %>
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <% ownersArray.forEach(o => { %>
+          <div class="col">
+            <div class="card shadow-sm h-100 border-2 border-<%= o.status === 'Active' ? 'success' : 'danger' %>-subtle rounded-4">
+              <div class="card-body p-3">
+                
+                <% 
+                  let img = o.profileImage; 
+                  if (img && !img.startsWith('/uploads/')) img = '/uploads/' + img; 
+                  const ownerStatus = o.status || 'Active';
+                  const statusClass = ownerStatus === 'Active' ? 'text-bg-success' : 'text-bg-danger';
+                %>
+                
+                <div class="d-flex align-items-center mb-3 pb-2 border-bottom">
+                  <a 
+                    href="#"
+                    data-bs-toggle="modal"
+                    data-bs-target="#viewProfileImage-<%= o._id %>" 
+                    title="View Profile Image"
+                  >
+                    <img
+                      src="<%= o.profileImage ? '/uploads/' + o.profileImage : '/images/owner_user.png' %>"
+                      alt="<%= o.firstName %> Profile Photo"
+                      class="rounded-circle border border-3 border-secondary shadow-sm"
+                      style="width: 60px; height: 60px; object-fit: cover"
+                    />
+                  </a>
+                  
+                  <div class="ms-3 flex-grow-1">
+                    <h5 class="card-title fw-bold mb-0 text-success-emphasis"><%= o.firstName %> <%= o.lastName %></h5>
+                    <p class="card-text text-muted small mb-1">
+                       Owner ID: **#<%= o.ownerId %>**
+                    </p>
+                    <span class="badge rounded-pill <%= statusClass %> fw-semibold">
+                      <i class="fas fa-<%= ownerStatus === 'Active' ? 'check' : 'times' %>-circle me-1"></i> <%= ownerStatus %>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="small">
+                  <div class="d-flex align-items-center mb-1">
+                    <i class="fas fa-envelope me-2 text-success-emphasis" style="width: 15px;"></i> 
+                    <span class="text-dark"><%= o.email || 'N/A' %></span>
+                  </div>
+                  <div class="d-flex align-items-center mb-1">
+                    <i class="fas fa-phone me-2 text-success-emphasis" style="width: 15px;"></i> 
+                    <span class="text-dark"><%= o.phone || 'N/A' %></span>
+                  </div>
+                  <% if (o.phone2) { %>
+                    <div class="d-flex align-items-center mb-1 text-muted">
+                      <i class="fas fa-mobile-alt me-2" style="width: 15px;"></i> 
+                      <span><%= o.phone2 %> (Secondary)</span>
+                    </div>
+                  <% } %>
+                  
+                  <div class="d-flex align-items-start mb-2 text-muted">
+                    <i class="fas fa-map-marker-alt me-2 pt-1" style="width: 15px;"></i> 
+                    <span class="flex-grow-1"><%= o.address || 'Address not listed' %></span>
+                  </div>
+                    <div class="d-flex align-items-center mt-2">
+                  <i class="fas fa-paw me-2 text-success" style="width: 15px;"></i>
+                  <strong class="text-dark">
+                    <%= (o.petsCount || (o.pets ? o.pets.length : 0)) %>
+                  </strong>
+                  <span class="text-muted ms-1">
+                    Pet<%= (o.petsCount || (o.pets ? o.pets.length : 0)) !== 1 ? 's' : '' %>
+                  </span>
+                </div>
+                            <div class="col-lg-6">
+                            
+                            </div>
+                  </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-3 pt-2 border-top">
+                  <button
+                    class="btn btn-outline-success btn-sm rounded-3 fw-bold"
+                    title="Edit Owner"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editOwnerModal-<%= o._id %>"
+                  >
+                    <i class="fas fa-edit me-1"></i> Edit
+                  </button>
+
+                  <form action="/owners/<%= o._id %>?_method=DELETE" method="POST" class="d-inline">
+                    <button
+                      type="submit"
+                      class="btn btn-outline-danger btn-sm rounded-3 fw-bold"
+                      title="Delete Owner"
+                      onclick="return confirm('Are you sure you want to permanently delete <%= o.firstName %> <%= o.lastName %> (ID: <%= o.ownerId %>)?')"
+                    >
+                      <i class="fas fa-trash-alt me-1"></i> Delete
+                    </button>
+                  </form>
+                </div>
+                
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+
+    <% if (currentTotalPages > 1) { %>
+      <nav aria-label="Owners Pagination" class="mt-4">
+        <ul class="pagination pagination-sm justify-content-center shadow-sm rounded-pill p-1 border">
+          <% 
+          // Smart pagination logic
+          const maxPagesToShow = 5;
+          let startPage = Math.max(1, currentPageNumber - Math.floor(maxPagesToShow / 2));
+          let endPage = Math.min(currentTotalPages, startPage + maxPagesToShow - 1);
+
+          if (endPage - startPage + 1 < maxPagesToShow) {
+              startPage = Math.max(1, endPage - maxPagesToShow + 1);
+          }
+          %>
+
+          <% if (currentPageNumber > 1) { %>
+            <li class="page-item rounded-pill">
+              <a class="page-link border-0 rounded-pill d-flex align-items-center gap-1 px-3 text-success"
+                  href="<%= createPageLink(currentPageNumber - 1) %>">
+                <i class="fas fa-chevron-left"></i> 
+              </a>
+            </li>
+          <% } %>
+
+          <% if (startPage > 1) { %>
+              <li class="page-item disabled"><span class="page-link border-0 text-muted">...</span></li>
+          <% } %>
+          
+          <% for (let i = startPage; i <= endPage; i++) { %>
+            <li class="page-item <%= currentPageNumber == i ? 'active' : '' %> rounded-pill">
+              <a class="page-link px-3 border-0 rounded-pill <%= currentPageNumber == i ? 'bg-success text-white shadow-sm fw-bold' : 'text-success' %>" 
+                  href="<%= createPageLink(i) %>">
+                <%= i %>
+              </a>
+            </li>
+          <% } %>
+
+          <% if (endPage < currentTotalPages) { %>
+              <li class="page-item disabled"><span class="page-link border-0 text-muted">...</span></li>
+          <% } %>
+
+          <% if (currentPageNumber < currentTotalPages) { %>
+            <li class="page-item rounded-pill">
+              <a class="page-link border-0 rounded-pill d-flex align-items-center gap-1 px-3 text-success"
+                  href="<%= createPageLink(currentPageNumber + 1) %>">
+                <i class="fas fa-chevron-right"></i>
+              </a>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    <% } %>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
