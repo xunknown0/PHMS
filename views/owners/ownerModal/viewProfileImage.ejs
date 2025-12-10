@@ -10,33 +10,31 @@
 
         <div class="modal-body text-center p-4">
 
-          <img 
-            src="<%= imgSrc || '/images/owner_user.png' %>"
-            alt="<%= owner.firstName %> <%= owner.lastName %>"
-            class="img-fluid rounded-circle shadow border border-success"
-            style="width:150px; height:150px; object-fit:cover;"
-          >
+             <img src="<%= imgSrc || '/images/owner_user.png' %>"
+              alt="<%= owner.firstName %> <%= owner.lastName %>"
+              class="rounded-circle border border-3 shadow-sm
+                <%= owner.status === 'Inactive' ? 'border-danger' : 'border-success' %>"
+              style="width:150px; height:150px; object-fit:cover;">
 
-          <h6 class="fw-bold mt-3 mb-0 text-success">
+          <h6 class="fw-bold mt-3 mb-0 
+            <%= owner.status === 'Inactive' ? 'text-danger' : 'text-success' %>">
             <%= owner.firstName %> <%= owner.lastName %>
           </h6>
 
           <small class="text-muted d-block">
             ID: <%= owner.ownerId %>
           </small>
-
         </div>
 
         <div class="modal-footer justify-content-center border-0 pb-3">
           <button 
             type="button" 
-            class="btn btn-success btn-sm rounded-pill" 
-            data-bs-dismiss="modal"
-          >
+            class="btn btn-sm rounded-pill 
+              <%= owner.status === 'Inactive' ? 'btn-danger' : 'btn-success' %>" 
+            data-bs-dismiss="modal">
             Close
           </button>
         </div>
-
       </div>
     </div>
   </div>

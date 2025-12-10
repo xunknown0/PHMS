@@ -1,305 +1,185 @@
+<style>
+  .container {
+  width: 90%; /* Use 90% of the screen */
+  max-width: 1200px; /* But never go wider than 1200 pixels */
+  margin: 0 auto; /* Center the container */
+}
+</style>
 <div class="modal fade"
-      id="editOwnerModal-<%= owner._id %>"
-      tabindex="-1"
-      aria-labelledby="editOwnerModalLabel-<%= owner._id %>"
-      aria-hidden="true">
+     id="editOwnerModal-<%= owner._id %>"
+     tabindex="-1"
+     aria-labelledby="editOwnerModalLabel-<%= owner._id %>"
+     aria-hidden="true">
 
   <div class="modal-dialog modal-xl modal-dialog-centered">
     <div class="modal-content rounded-4 shadow-lg border-0">
 
-      <form action="/owners/<%= owner._id %>?_method=PUT"
-            method="POST"
-            enctype="multipart/form-data">
+      <form action="/owners/<%= owner._id %>?_method=PUT" method="POST" enctype="multipart/form-data">
 
         <div class="modal-header bg-success text-white p-3">
           <h5 class="modal-title fw-bold" id="editOwnerModalLabel-<%= owner._id %>">
-            <i class="fas fa-edit me-2"></i>
-            Edit Owner Record — <%= owner.firstName %> <%= owner.lastName %> (ID: <%= owner.ownerId %>)
+            <i class="fas fa-edit me-2"></i> Edit Owner — <%= owner.firstName %> <%= owner.lastName %>
           </h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
+        <div class="modal-body px-4 py-4">
+          <div class="row g-4">
+            <div class="col-lg-6">
+              <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Profile Photo</h6>
+              <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
 
-                  <div class="modal-body px-4 py-4">
+                <% 
+                  let imgSrc = owner.profileImage;
+                  if (imgSrc && !imgSrc.startsWith('/uploads/') && !imgSrc.startsWith('data:image')) imgSrc = '/uploads/' + imgSrc;
+                  const defaultImg = '/images/owner_user.png';
+                %>
 
-                    <div class="row g-4">
-                      
-                      <div class="col-lg-6">
+                <img id="previewEditImg-<%= owner._id %>"
+                    src="<%= imgSrc || defaultImg %>"
+                    class="rounded-circle border border-4 border-success me-3 shadow-sm"
+                    style="width:90px;height:90px;object-fit:cover" alt="Profile Photo">
 
-                        <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Profile Photo</h6>
+                <div class="flex-grow-1">
+                  <label class="form-label fw-medium mb-1">Update Image</label>
+                  <div class="input-group input-group-sm mb-2">
+                    <input type="file" name="image" accept="image/*" class="form-control"
+                          onchange="loadOwnerEditImage(event, '<%= owner._id %>')">
+                    <input type="hidden" id="cameraImageEdit-<%= owner._id %>" name="cameraImage">
+                    <button type="button" class="btn btn-success" onclick="startCameraEdit('<%= owner._id %>')" title="Capture photo">
+                      <i class="fas fa-camera"></i>
+                    </button>
+                  </div>
+                  <div class="text-muted small mt-1">Upload or capture a new photo.</div>
+                </div>
+              </div>
 
-          <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
-
-            <% 
-              let img = owner.profileImage;
-              if (img && !img.startsWith('/uploads/')) img = '/uploads/' + img;
-              const defaultImg = '/images/owner_user.png';
-            %>
-
-            <img id="previewEditImg-<%= owner._id %>"
-                src="<%= img || defaultImg %>"
-                class="rounded-circle border border-4 border-success me-3 shadow-sm"
-                style="width:90px;height:90px;object-fit:cover">
-
-          <div class="flex-grow-1">
-  <label class="form-label fw-medium mb-1">Update Image</label>
-
-  <div class="input-group input-group-sm mb-2">
-
-    <input type="file"
-           name="image"
-           accept="image/*"
-           class="form-control"
-           onchange="loadOwnerEditImage(event, '<%= owner._id %>')">
-
-    <input type="hidden"
-           id="cameraImageEdit-<%= owner._id %>"
-           name="cameraImage">
-
-    <button type="button"
-            class="btn btn-success"
-            onclick="startCameraEdit('<%= owner._id %>')">
-      <i class="fas fa-camera"></i>
-    </button>
-
-  </div>
-
-  <div class="text-muted small mt-1">Upload or capture photo.</div>
-
-</div>
-<div id="cameraWrapperEdit"
-     class="position-fixed top-0 start-0 w-100 h-100
-            d-none d-flex justify-content-center align-items-center"
-     style="z-index:1055; backdrop-filter: blur(6px); background: rgba(0,0,0,.4);">
-
-  <div class="bg-white p-3 rounded-4 shadow position-relative"
-       style="max-width:420px">
-
-    <video id="cameraStreamEdit" autoplay class="rounded-3 w-100 mb-3"></video>
-
-    <div id="cameraTimerEdit"
-         class="position-absolute top-50 start-50 translate-middle
-                text-white fw-bold display-6"
-         style="text-shadow:0 0 10px #000; display:none;">
-      3
-    </div>
-
-    <div class="text-center">
-      <button type="button" class="btn btn-success" onclick="capturePhotoWithTimerEdit()">
-        <i class="fas fa-camera me-2"></i> Capture
-      </button>
-
-      <button type="button"
-              class="btn btn-outline-danger ms-2"
-              onclick="stopCameraEdit()">
-        Close
-      </button>
-    </div>
-  </div>
-</div>
-
-
-          </div>
+              <div id="cameraWrapperEdit-<%= owner._id %>"
+                  class="position-fixed top-0 start-0 w-100 h-100 d-none d-flex justify-content-center align-items-center"
+                  style="z-index:1055; backdrop-filter: blur(6px); background: rgba(0,0,0,.4);">
+                <div class="bg-white p-3 rounded-4 shadow position-relative" style="max-width:420px; width:90%">
+                  <video id="cameraStreamEdit-<%= owner._id %>" autoplay class="rounded-3 w-100 mb-3"></video>
+                  <div id="cameraTimerEdit-<%= owner._id %>"
+                      class="position-absolute top-50 start-50 translate-middle text-white fw-bold display-6"
+                      style="text-shadow:0 0 10px #000; display:none;">3</div>
+                  <div class="text-center">
+                    <button type="button" class="btn btn-success" onclick="capturePhotoWithTimerEdit('<%= owner._id %>')">
+                      <i class="fas fa-camera me-2"></i> Capture
+                    </button>
+                    <button type="button" class="btn btn-outline-danger ms-2" onclick="stopCameraEdit('<%= owner._id %>')">
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
 
 
               <h6 class="text-success fw-bold border-bottom pb-1 mb-3 mt-4">Personal Details</h6>
               <div class="row g-3">
-
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" required name="firstName" class="form-control" id="editFirstName-<%= owner._id %>" placeholder="First Name" value="<%= owner.firstName %>">
                     <label for="editFirstName-<%= owner._id %>">First Name <span class="text-danger">*</span></label>
                   </div>
                 </div>
-
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" required name="lastName" class="form-control" id="editLastName-<%= owner._id %>" placeholder="Last Name" value="<%= owner.lastName %>">
                     <label for="editLastName-<%= owner._id %>">Last Name <span class="text-danger">*</span></label>
                   </div>
                 </div>
-
                 <div class="col-md-6">
                   <label class="form-label text-muted small mb-1">Gender</label>
                   <select name="gender" class="form-select">
                     <option value="">-- Select --</option>
-                    <option value="Male"   <%= owner.gender==="Male" ? "selected" : "" %>>Male</option>
-                    <option value="Female" <%= owner.gender==="Female" ? "selected" : "" %>>Female</option>
-                    <option value="Other"  <%= owner.gender==="Prefer not to say" ? "selected" : "" %>>Prefer not to say</option>
+                    <option value="Male" <%= owner.gender === "Male" ? "selected" : "" %>>Male</option>
+                    <option value="Female" <%= owner.gender === "Female" ? "selected" : "" %>>Female</option>
+                    <option value="Prefer not to say" <%= owner.gender === "Prefer not to say" ? "selected" : "" %>>Prefer not to say</option>
                   </select>
                 </div>
-                
                 <div class="col-md-6">
                   <label class="form-label text-muted small mb-1">Status</label>
                   <select name="status" class="form-select">
-                    <option value="Active" <%= owner.status==="Active" ? "selected" : "" %>>Active</option>
-                    <option value="Inactive" <%= owner.status==="Inactive" ? "selected" : "" %>>Inactive</option>
+                    <option value="Active" <%= owner.status === "Active" ? "selected" : "" %>>Active</option>
+                    <option value="Inactive" <%= owner.status === "Inactive" ? "selected" : "" %>>Inactive</option>
                   </select>
                 </div>
-                  <div class="col-md-6">
+                <div class="col-md-6">
                   <label class="form-label text-muted small mb-1">Civil Status</label>
                   <select name="civilStatus" class="form-select">
-                    <option value="Single" <%= owner.civilStatus !== 'Single' ? 'selected' : '' %>>Single</option>
-                    <option  value="Married"<%= owner.civilStatus === 'Married' ? 'selected' : '' %>>Married</option>
-                    <option  value="Divorced"<%= owner.civilStatus === 'Divorced' ? 'selected' : '' %>>Divorced</option>
-                    <option  value="Widowed" <%= owner.civilStatus === 'Widowed' ? 'selected' : '' %>>Widowed</option>
-                      <option  value="Other" <%= owner.civilStatus === 'Other' ? 'selected' : '' %>>Other</option>
+                    <option value="Single" <%= owner.civilStatus === 'Single' ? 'selected' : '' %>>Single</option>
+                    <option value="Married" <%= owner.civilStatus === 'Married' ? 'selected' : '' %>>Married</option>
+                    <option value="Divorced" <%= owner.civilStatus === 'Divorced' ? 'selected' : '' %>>Divorced</option>
+                    <option value="Widowed" <%= owner.civilStatus === 'Widowed' ? 'selected' : '' %>>Widowed</option>
+                    <option value="Other" <%= owner.civilStatus === 'Other' ? 'selected' : '' %>>Other</option>
                   </select>
                 </div>
-    <div class="col-md-6">
-  <div class="form-floating">
-    <input type="date"
-      id="ownerBirthdate"
-      name="birthdate"
-      class="form-control"
-      value="<%= oldData?.birthdate
-        ? new Date(oldData.birthdate).toISOString().substring(0,10)
-        : (owner.birthdate ? new Date(owner.birthdate).toISOString().substring(0,10) : '')
-      %>">
-    <label>Birthdate</label>
-  </div>
-</div>
-
-
+                <div class="col-md-6">
+                  <% 
+                    const rawDate = owner.birthdate || oldData?.birthdate;
+                    const birthdateValue = rawDate ? new Date(rawDate).toISOString().substring(0,10) : '';
+                  %>
+                  <div class="form-floating">
+                    <input type="date" id="ownerEditBirthdate-<%= owner._id %>" name="birthdate" class="form-control" value="<%= birthdateValue %>">
+                    <label for="ownerEditBirthdate-<%= owner._id %>">Birthdate</label>
+                  </div>
+                </div>
               </div>
             </div>
             
             <div class="col-lg-6">
               <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Contact Information</h6>
               <div class="row g-3">
-                
                 <div class="col-12">
                   <div class="form-floating">
                     <input type="email" name="email" class="form-control" id="editEmail-<%= owner._id %>" placeholder="Email" value="<%= owner.email || '' %>">
                     <label for="editEmail-<%= owner._id %>">Email</label>
                   </div>
                 </div>
-
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" name="phone" class="form-control" id="editPhone-<%= owner._id %>" placeholder="Primary Phone" value="<%= owner.phone || '' %>">
                     <label for="editPhone-<%= owner._id %>">Primary Phone</label>
                   </div>
                 </div>
-
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" name="phone2" class="form-control" id="editPhone2-<%= owner._id %>" placeholder="Secondary Phone" value="<%= owner.phone2 || '' %>">
                     <label for="editPhone2-<%= owner._id %>">Secondary Phone</label>
                   </div>
                 </div>
-
-                 <div class="col-md-6">
+                <div class="col-md-6">
                   <div class="form-floating">
-                    <input type="text" name="emergencyContactPerson" class="form-control" id="editemergencyContactPerson-<%= owner._id %>" placeholder="Emergency Contact Person" value="<%= owner.emergencyContactPerson || '' %>">
+                    <input type="text" name="emergencyContactPerson" class="form-control" id="editemergencyContactPerson-<%= owner._id %>" placeholder="E.C. Person" value="<%= owner.emergencyContactPerson || '' %>">
                     <label for="editemergencyContactPerson-<%= owner._id %>">Emergency Contact Person</label>
                   </div>
                 </div>
-
-                   <div class="col-md-6">
+                <div class="col-md-6">
                   <div class="form-floating">
-                    <input type="text" name="emergencyContactNumber" class="form-control" id="editemergencyContactNumber-<%= owner._id %>" placeholder="Emergency Contact Number" value="<%= owner.emergencyContactNumber || '' %>">
+                    <input type="text" name="emergencyContactNumber" class="form-control" id="editemergencyContactNumber-<%= owner._id %>" placeholder="E.C. Number" value="<%= owner.emergencyContactNumber || '' %>">
                     <label for="editemergencyContactNumber-<%= owner._id %>">Emergency Contact Number</label>
                   </div>
                 </div>
-
-
                 <div class="col-12">
                   <label class="form-label text-muted small mb-1">Address</label>
                   <textarea name="address" rows="3" class="form-control" style="height: 100px;"><%= owner.address || '' %></textarea>
                 </div>
-                
               </div>
             </div>
           </div>
           
-          <div class="text-end small text-muted mt-3">
-            <span class="text-danger">*</span> Required Fields
-          </div>
-
+          <div class="text-end small text-muted mt-3"><span class="text-danger">*</span> Required Fields</div>
         </div>
 
-
         <div class="modal-footer bg-light border-top d-flex justify-content-end py-3">
-          <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">
-            Cancel
-          </button>
-
+          <button type="button" class="btn btn-outline-secondary me-2" data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-success fw-bold px-4">
             <i class="fas fa-save me-2"></i> Save Changes
           </button>
         </div>
-
       </form>
     </div>
   </div>
 </div>
 
-<script>
-  function loadOwnerEditImage(event, ownerId){
-  const file = event.target.files[0];
-  if (!file) return;
-  const preview = document.getElementById("previewEditImg-" + ownerId);
-  preview.src = URL.createObjectURL(file);
-
-  }
-
-let editingOwnerId = null;
-let editStream;
-
-// open camera
-async function startCameraEdit(ownerId){
-  editingOwnerId = ownerId;
-  document.getElementById("cameraWrapperEdit").classList.remove("d-none");
-
-  try{
-    editStream = await navigator.mediaDevices.getUserMedia({ video:true });
-    document.getElementById("cameraStreamEdit").srcObject = editStream;
-  }catch(err){
-    alert("Camera unavailable or permission denied.");
-    stopCameraEdit();
-  }
-}
-
-// stop
-function stopCameraEdit(){
-  if(editStream){
-    editStream.getTracks().forEach(track => track.stop());
-  }
-  document.getElementById("cameraWrapperEdit").classList.add("d-none");
-}
-
-
-// capture with timer
-function capturePhotoWithTimerEdit(){
-  const video = document.getElementById("cameraStreamEdit");
-  const canvas = document.createElement("canvas");
-
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-
-  canvas.getContext("2d").drawImage(video,0,0);
-
-  const base64 = canvas.toDataURL("image/jpeg");
-
-  document.getElementById(`previewEditImg-${editingOwnerId}`).src = base64;
-  document.getElementById(`cameraImageEdit-${editingOwnerId}`).value = base64;
-
-  stopCameraEdit();
-}
-
-
-// override file preview
-function loadOwnerEditImage(event, ownerId){
-  const file = event.target.files[0];
-  if(!file) return;
-
-  document.getElementById(`previewEditImg-${ownerId}`).src =
-    URL.createObjectURL(file);
-
-  // clear camera hidden value
-  document.getElementById(`cameraImageEdit-${ownerId}`).value = "";
-}
-</script>
-
-
+<script src="/javascripts/editOwnerModal.js"></script>

@@ -23,7 +23,6 @@
         <!-- BODY -->
         <div class="modal-body px-4 py-4">
 
-
           <!-- GLOBAL ERRORS -->
           <% if (errorsList?.length) { %>
           <div class="alert alert-danger rounded-3 p-3 mb-4">
@@ -36,82 +35,71 @@
           </div>
           <% } %>
 
-
-
           <div class="row g-4">
-
             <!-- LEFT -->
-            <div class="col-lg-6">
+          <div class="col-lg-6">
 
+          <!-- PROFILE IMAGE -->
+          <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
+            <img id="previewImg"
+                src="/uploads/default-user.png"
+                class="rounded-circle border border-4 me-3 shadow-sm"
+                style="width:90px;height:90px;object-fit:cover">
 
-              <!-- PROFILE IMAGE -->
-             <!-- PROFILE IMAGE -->
-<div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
-  <img id="previewImg"
-       src="/uploads/default-user.png"
-       class="rounded-circle border border-4 me-3 shadow-sm"
-       style="width:90px;height:90px;object-fit:cover">
+                    <div class="flex-grow-1">
+                      <label class="form-label fw-semibold mb-1">Profile Picture</label>
 
-          <div class="flex-grow-1">
-            <label class="form-label fw-semibold mb-1">Profile Picture</label>
+                      <div class="input-group input-group-sm mb-2">
+                        <input type="file"
+                              name="image"
+                              accept="image/*"
+                              class="form-control"
+                              onchange="loadOwnerImage(event)">
+                        <input type="hidden" id="cameraImage" name="cameraImage">
 
-            <div class="input-group input-group-sm mb-2">
-              <input type="file"
-                    name="image"
-                    accept="image/*"
-                    class="form-control"
-                    onchange="loadOwnerImage(event)">
-<input type="hidden" id="cameraImage" name="cameraImage">
+                        <button type="button"
+                                class="btn btn-success"
+                                onclick="startCamera()">
+                          <i class="fas fa-camera"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- CAMERA OVERLAY -->
+                  <div id="cameraWrapper"
+                      class="position-fixed top-0 start-0 w-100 h-100
+                              d-none d-flex justify-content-center align-items-center"
+                      style="z-index:1055; backdrop-filter: blur(6px); background: rgba(0,0,0,.4);">
+                    <div class="bg-white p-3 rounded-4 shadow position-relative"
+                        style="max-width:420px">
 
-              <button type="button"
-                      class="btn btn-success"
-                      onclick="startCamera()">
-                <i class="fas fa-camera"></i>
-              </button>
+                      <!-- Live video -->
+                      <video id="cameraStream" autoplay class="rounded-3 w-100 mb-3"></video>
+
+                      <!-- Countdown -->
+                    <div id="cameraTimer"
+                      class="position-absolute top-50 start-50 translate-middle
+                      text-white fw-bold display-1" 
+                      style="text-shadow: 0 0 15px rgba(0,0,0,0.8), 0 0 5px #000; display:none;">
+                      3
+                  </div>
+
+                <div class="text-center">
+                  <button type="button" class="btn btn-success" onclick="capturePhotoWithTimer()">
+                    <i class="fas fa-camera me-2"></i> Capture
+                  </button>
+
+                  <button type="button"
+                          class="btn btn-outline-danger ms-2"
+                          onclick="stopCamera()">Close
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <!-- CAMERA OVERLAY -->
-<!-- CAMERA OVERLAY -->
-<div id="cameraWrapper"
-     class="position-fixed top-0 start-0 w-100 h-100
-            d-none d-flex justify-content-center align-items-center"
-     style="z-index:1055; backdrop-filter: blur(6px); background: rgba(0,0,0,.4);">
-
-  <div class="bg-white p-3 rounded-4 shadow position-relative"
-       style="max-width:420px">
-
-    <!-- Live video -->
-    <video id="cameraStream" autoplay class="rounded-3 w-100 mb-3"></video>
-
-    <!-- Countdown -->
-    <div id="cameraTimer"
-         class="position-absolute top-50 start-50 translate-middle
-                text-white fw-bold display-6"
-         style="text-shadow:0 0 10px #000; display:none;">
-      3
-    </div>
-
-    <div class="text-center">
-      <button type="button" class="btn btn-success" onclick="capturePhotoWithTimer()">
-        <i class="fas fa-camera me-2"></i> Capture
-      </button>
-
-      <button type="button"
-              class="btn btn-outline-danger ms-2"
-              onclick="stopCamera()">
-        Close
-      </button>
-    </div>
-  </div>
-</div>
 
 
               <h6 class="text-success fw-bold border-bottom pb-1 mb-3">Personal Details</h6>
-
               <div class="row g-3 mb-4">
-
                 <div class="col-md-6">
                   <div class="form-floating">
                     <input type="text" required name="firstName" class="form-control"
@@ -145,7 +133,8 @@
                     <option <%= oldData?.status === 'Inactive' ? 'selected' : '' %>>Inactive</option>
                   </select>
                 </div>
-                     <div class="col-md-6">
+                
+                <div class="col-md-6">
                   <label class="form-label small text-muted mb-1">Civil Status</label>
                   <select name="civilStatus" class="form-select">
                     <option <%= oldData?.civilStatus !== 'Single' ? 'selected' : '' %>>Single</option>
@@ -187,9 +176,7 @@
                       Email already exists, please choose another.
                     </div>
                   <% } %>
-
                 </div>
-
 
                 <div class="col-md-6">
                   <div class="form-floating">
@@ -229,16 +216,13 @@
 
               </div>
             </div>
-
           </div>
         </div>
-
 
 
         <!-- FOOTER -->
         <div class="modal-footer bg-light border-top d-flex justify-content-between px-4 py-3">
           <small class="text-muted fst-italic">Fields marked with * are required.</small>
-
           <div>
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
             <button class="btn btn-success px-4 fw-semibold"><i class="fas fa-save me-2"></i>Register Owner</button>
@@ -251,150 +235,4 @@
   </div>
 </div>
 
-<script>
-/* ==========================================================
-   CAMERA + AUTO UPLOAD MODULE
-========================================================== */
-
-let cameraStream = null;
-let timerLoop    = null;
-let faceLoop     = null;
-
-let currentZoom   = 1;
-const AUTO_ZOOM_MAX = 2.4;
-const TARGET_FACE_RATIO = 0.32;
-
-
-/* Helpers */
-const $ = id => document.getElementById(id);
-
-const videoEl  = () => $("cameraStream");
-const preview  = () => $("previewImg");
-const modal    = () => $("cameraWrapper");
-const timerUI  = () => $("cameraTimer");
-
-
-/* File Picker Preview */
-function loadOwnerImage(e){
-  const f = e.target.files?.[0];
-  if (f) preview().src = URL.createObjectURL(f);
-}
-
-
-/* Start Camera */
-async function startCamera(){
-  try{
-    modal().classList.remove("d-none");
-
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video:true });
-    videoEl().srcObject = cameraStream;
-
-    startFaceZoomLoop();
-  }
-  catch(err){
-    alert("Camera unavailable or permission denied.");
-  }
-}
-
-
-/* Stop Camera */
-function stopCamera(){
-  modal().classList.add("d-none");
-
-  clearInterval(timerLoop);
-  clearInterval(faceLoop);
-
-  videoEl().style.transform = "scale(1)";
-  currentZoom = 1;
-
-  cameraStream?.getTracks().forEach(t=>t.stop());
-  cameraStream = null;
-}
-
-
-/* Auto Zoom Using FaceDetector (if supported) */
-function startFaceZoomLoop(){
-
-  if (!("FaceDetector" in window)) return;
-  const detector = new FaceDetector({ fastMode:true });
-
-  faceLoop = setInterval(async ()=>{
-    const vid = videoEl();
-    if(!vid.videoWidth) return;
-
-    const faces = await detector.detect(vid);
-    if(!faces.length) return;
-
-    const box = faces[0].boundingBox;
-    const frame = vid.videoWidth * vid.videoHeight;
-    const face  = box.width * box.height;
-
-    let desired = Math.sqrt(TARGET_FACE_RATIO / (face / frame));
-    desired = Math.min(AUTO_ZOOM_MAX, Math.max(1, desired));
-    currentZoom = currentZoom * .85 + desired * .15;
-
-    vid.style.transform = `scale(${currentZoom})`;
-  }, 120);
-}
-
-
-/* MAIN CAPTURE */
-function performFullCapture(){
-  const vid = videoEl();
-  const canvas = document.createElement("canvas");
-
-  canvas.width  = vid.videoWidth;
-  canvas.height = vid.videoHeight;
-  canvas.getContext("2d").drawImage(vid,0,0);
-
-  const base64 = canvas.toDataURL("image/png");
-  preview().src = base64;
-
-  stopCamera();
-  uploadCameraImage(base64);        // <--- NEW
-}
-
-
-/* Upload to backend using FormData */
-async function uploadCameraImage(base64){
-
-  // convert to blob
-  const r   = await fetch(base64);
-  const blob = await r.blob();
-
-  // create fake file
-  const file = new File([blob], "camera.png", { type: "image/png" });
-
-  const form = new FormData();
-  form.append("image", file);
-
-  const response = await fetch("/owners/camera-upload", {
-    method: "POST",
-    body: form
-  });
-
-  const result = await response.json();
-
-  $("cameraImage").value = result.fileName;  // store filename
-}
-
-
-/* COUNTDOWN */
-function capturePhotoWithTimer(){
-  let sec = 3;
-
-  timerUI().innerText = sec;
-  timerUI().style.display = "block";
-
-  timerLoop = setInterval(()=>{
-    sec--;
-    timerUI().innerText = sec;
-
-    if(sec <= 0){
-      clearInterval(timerLoop);
-      timerUI().style.display = "none";
-      performFullCapture();
-    }
-  },1000);
-}
-</script>
+<script src="/javascripts/addOwnerModal.js"></script>

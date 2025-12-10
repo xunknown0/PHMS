@@ -5,258 +5,330 @@ const path = require("path");
 const uploadPath = path.join(__dirname, "..", "public", "uploads");
 
 /* ---------------------------------------------------
-   File helper
+    File helper
 --------------------------------------------------- */
 function deleteFile(filename) {
-  if (!filename) return;
-  const p = path.join(uploadPath, filename);
-  if (fs.existsSync(p)) fs.unlinkSync(p);
+    if (!filename) return;
+    const p = path.join(uploadPath, filename);
+    // Use async fs.promises.unlink in a production environment for non-blocking I/O
+    if (fs.existsSync(p)) fs.unlinkSync(p);
 }
 
 /* ---------------------------------------------------
-   Save Base64 image (camera)
+    Save Base64 image (camera)
 --------------------------------------------------- */
 function saveBase64Image(base64String) {
-  try {
-    const fileName = `camera_${Date.now()}.jpg`;
-    const filePath = path.join(uploadPath, fileName);
+    try {
+        const fileName = `camera_${Date.now()}.jpg`;
+        const filePath = path.join(uploadPath, fileName);
 
-    const base64Data = base64String.replace(/^data:image\/\w+;base64,/, "");
-    const imageBuffer = Buffer.from(base64Data, "base64");
+        const base64Data = base64String.replace(/^data:image\/\w+;base64,/, "");
+        const imageBuffer = Buffer.from(base64Data, "base64");
 
-    fs.writeFileSync(filePath, imageBuffer);
+        // Use async fs.promises.writeFile in a production environment
+        fs.writeFileSync(filePath, imageBuffer);
 
-    return fileName;
-  } catch (err) {
-    console.error("Camera save failed:", err);
-    return null;
-  }
+        return fileName;
+    } catch (err) {
+        console.error("Camera save failed:", err);
+        return null;
+    }
 }
 
 /* ---------------------------------------------------
-   Pagination
+    Pagination
 --------------------------------------------------- */
 async function paginate(query, page = 1, limit = 6) {
-  const total = await Owner.countDocuments(query);
-  const owners = await Owner.find(query)
-    .skip((page - 1) * limit)
-    .limit(limit)
-    .sort({ createdAt: -1 });
+    const total = await Owner.countDocuments(query);
+    const owners = await Owner.find(query)
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .sort({ createdAt: -1 });
 
-  return { owners, total, totalPages: Math.ceil(total / limit) };
+    return { owners, total, totalPages: Math.ceil(total / limit) };
 }
 
 /* ---------------------------------------------------
-   Validation
+    Validation
 --------------------------------------------------- */
 function validateOwner({ firstName, lastName }) {
-  const errors = [];
-  if (!firstName) errors.push({ msg: "First name is required" });
-  if (!lastName) errors.push({ msg: "Last name is required" });
-  return errors;
+    const errors = [];
+    if (!firstName) errors.push({ msg: "First name is required" });
+    if (!lastName) errors.push({ msg: "Last name is required" });
+    return errors;
 }
 
 /* ---------------------------------------------------
-   Flash helper
+    Redirect Helper (NEW)
+    Builds the redirect URL based on existing query parameters
 --------------------------------------------------- */
-function rejectOwner(req, body, message) {
-  req.flash("errors", [{ msg: message }]);
-  req.flash("oldData", body);
-  return req.res.redirect("/owners");
+function keepQueryAndRedirect(req, success = false, message = "") {
+    const { page, limit, search } = req.query;
+    const query = new URLSearchParams();
+
+    if (page) query.append("page", page);
+    if (limit) query.append("limit", limit);
+    // Retain search term for visual context even on success/error
+    if (search) query.append("search", search);
+
+    if (success) {
+        req.flash("success", message);
+    } else {
+        req.flash("errors", [{ msg: message }]);
+        req.flash("oldData", req.body);
+    }
+
+    const queryString = query.toString();
+    const path = `/owners${queryString ? `?${queryString}` : ''}`;
+    return req.res.redirect(path);
 }
 
+
+/* ---------------------------------------------------
+    Flash helper (REMOVED: Replaced by keepQueryAndRedirect)
+--------------------------------------------------- */
+// function rejectOwner(req, body, message) {
+//     req.flash("errors", [{ msg: message }]);
+//     req.flash("oldData", body);
+//     return req.res.redirect("/owners");
+// }
+
 /* ===================================================
-   helpers
+    helpers
 =================================================== */
 async function uniqueEmail(email, currentId) {
-  if (!email) return false;
+    if (!email) return false;
 
-  const existing = await Owner.findOne({
-    email: new RegExp(`^${email}$`, "i"),
-    _id: { $ne: currentId || null },
-  });
+    const existing = await Owner.findOne({
+        email: new RegExp(`^${email}$`, "i"),
+        _id: { $ne: currentId || null },
+    });
 
-  return !!existing;
+    return !!existing;
 }
 
+
+
 /* ===================================================
-   CONTROLLER
+    CONTROLLER
 =================================================== */
 module.exports = {
-  /* LIST */
-  listOwners: async (req, res) => {
-    try {
-      const page = +req.query.page || 1;
-      const limit = +req.query.limit || 6;
-      const rawSearch = req.query.search || "";
-      const search = rawSearch.trim().replace(/\s+/g, " "); // normalize spaces
+    /* LIST */
+    listOwners: async (req, res) => {
+        try {
+            // Query parameters -----------------------------------------
+            const {
+                page: pageQuery,
+                limit: limitQuery,
+                search: rawSearch = "",
+            } = req.query;
 
-const searchRegex = new RegExp(search, "i");
+            const page = Number(pageQuery) || 1;
+            const limit = Number(limitQuery) || 6;
 
-const q = search
-  ? {
-      $or: [
-        { firstName: searchRegex },
-        { lastName: searchRegex },
-        { email: searchRegex },
-        { phone: searchRegex },
-        { ownerId: searchRegex },
+            // Normalized search text ------------------------------------
+            const search = rawSearch.trim().replace(/\s+/g, " ");
+            const searchRegex = new RegExp(search, "i");
 
-        // FULL NAME search: "Miguel Dela Cruz"
-        {
-          $expr: {
-            $regexMatch: {
-              input: {
-                $concat: [
-                  { $trim: { input: "$firstName" } },
-                  " ",
-                  { $trim: { input: "$lastName" } }
-                ]
-              },
-              regex: searchRegex,
-            }
-          }
+            // Dynamic query --------------------------------------------
+            const q = search
+                ? {
+                    $or: [
+                        { firstName: searchRegex },
+                        { lastName: searchRegex },
+                        { email: searchRegex },
+                        { phone: searchRegex },
+                        { ownerId: searchRegex },
+
+                        // Full name search "Miguel Dela Cruz"
+                        {
+                            $expr: {
+                                $regexMatch: {
+                                    input: {
+                                        $concat: [
+                                            { $trim: { input: "$firstName" } },
+                                            " ",
+                                            { $trim: { input: "$lastName" } },
+                                        ],
+                                    },
+                                    regex: searchRegex,
+                                },
+                            },
+                        },
+                    ],
+                }
+                : {};
+
+            // Paging ----------------------------------------------------
+            const { owners, total, totalPages } = await paginate(q, page, limit);
+
+            // Render ----------------------------------------------------
+            res.render("owners/index", {
+                owners,
+                currentPage: page,
+                totalPages,
+                totalRecords: total,
+                search,
+                limit,
+                errorsList: req.flash("errors"),
+                oldData: req.flash("oldData")[0] || {},
+                successMessage: req.flash("success")[0] || "",
+            });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send("Error fetching owners list.");
         }
-      ]
-    }
-  : {};
-
-      const { owners, total, totalPages } = await paginate(q, page, limit);
-
-      res.render("owners/index", {
-        owners,
-        errorsList: req.flash("errors"),
-        oldData: req.flash("oldData")[0] || {},
-        successMessage: req.flash("success")[0] || "",
-        currentPage: page,
-        totalPages,
-        totalRecords: total,
-        search,
-        limit,
-      });
-    } catch (err) {
-      console.error(err);
-      res.status(500).send("Error fetching owners list.");
-    }
-  },
-
-  /* CREATE */
-  createOwner: async (req, res) => {
-    const errors = validateOwner(req.body);
-    if (errors.length) {
-      if (req.file) deleteFile(req.file.filename);
-      req.flash("errors", errors);
-      req.flash("oldData", req.body);
-      return res.redirect(keepPage(req, res));
-
-    }
-
-    try {
-      const email = req.body.email?.trim();
-
-      if (await uniqueEmail(email)) {
-        if (req.file) deleteFile(req.file.filename);
-        return rejectOwner(req, req.body, "Email already exists");
-      }
-
-   let profileImage = req.body.cameraImage || (req.file && req.file.filename) || null;
+    },
 
 
-      const payload = {
-        ...req.body,
-        email,
-        ownerId: Date.now().toString(36).toUpperCase(),
-        profileImage,
-      };
+    /* CREATE */
+    createOwner: async (req, res) => {
+        const errors = validateOwner(req.body);
+        
+        // 1. Validation Error
+        if (errors.length) {
+            if (req.file) deleteFile(req.file.filename);
+            req.flash("errors", errors);
+            req.flash("oldData", req.body);
+            // Redirect using the new helper. It uses the current page/search query.
+            return keepQueryAndRedirect(req, false, "Validation failed. Please check the required fields."); 
+        }
 
-      await Owner.create(payload);
+        let profileImage = req.body.cameraImage || (req.file && req.file.filename) || null;
 
-      req.flash("success", "Owner added successfully!");
-      res.redirect("/owners");
-    } catch (err) {
-      console.error(err);
-      if (req.file) deleteFile(req.file.filename);
-      return rejectOwner(req, req.body, "Error creating owner");
-    }
-  },
+        try {
+            const email = req.body.email?.trim();
 
-  /* UPDATE */
-  updateOwner: async (req, res) => {
-    try {
-      const owner = await Owner.findById(req.params.id);
-      if (!owner) {
-        if (req.file) deleteFile(req.file.filename);
-        return rejectOwner(req, req.body, "Owner not found");
-      }
+            // 2. Duplicate Email Error
+            if (await uniqueEmail(email)) {
+                if (req.file) deleteFile(req.file.filename);
+                return keepQueryAndRedirect(req, false, "Email already exists");
+            }
 
-      const errors = validateOwner(req.body);
-      if (errors.length) {
-        if (req.file) deleteFile(req.file.filename);
-        req.flash("errors", errors);
-        req.flash("oldData", req.body);
-        return res.redirect("/owners");
-      }
+            // If a camera image was provided, save the base64 string and get the filename
+            if (req.body.cameraImage) {
+                profileImage = saveBase64Image(req.body.cameraImage);
+                // Ensure to delete the temporary multer file if a camera image was provided
+                if (req.file) deleteFile(req.file.filename);
+            }
+            
+            const payload = {
+                ...req.body,
+                email,
+                // Simple unique ID for ownerId
+                ownerId: Date.now().toString(36).toUpperCase(), 
+                profileImage,
+            };
 
-      const email = req.body.email?.trim();
-      if (await uniqueEmail(email, owner._id)) {
-        if (req.file) deleteFile(req.file.filename);
-        return rejectOwner(req, req.body, "Email already exists");
-      }
+            await Owner.create(payload);
 
-      let profileImage = owner.profileImage;
+            // 3. Successful Create
+            // Redirect without preserving page/limit/search, as the new owner is on page 1
+            req.flash("success", "Owner added successfully!");
+            res.redirect("/owners");
 
-      if (req.file) {
-        deleteFile(owner.profileImage);
-        profileImage = req.file.filename;
-      } else if (req.body.cameraImage) {
-        // delete old photo
-        deleteFile(owner.profileImage);
-        profileImage = saveBase64Image(req.body.cameraImage);
-      }
+        } catch (err) {
+            console.error(err);
+            if (req.file) deleteFile(req.file.filename);
+            // 4. Server Error on Create
+            return keepQueryAndRedirect(req, false, "Error creating owner");
+        }
+    },
 
-      const payload = {
-        ...req.body,
-        email,
-        profileImage,
-      };
+    /* UPDATE */
+    updateOwner: async (req, res) => {
+        try {
+            const owner = await Owner.findById(req.params.id);
+            if (!owner) {
+                if (req.file) deleteFile(req.file.filename);
+                return keepQueryAndRedirect(req, false, "Owner not found");
+            }
 
-      await Owner.findByIdAndUpdate(req.params.id, payload);
+            const errors = validateOwner(req.body);
+            
+            // 1. Validation Error
+            if (errors.length) {
+                if (req.file) deleteFile(req.file.filename);
+                req.flash("errors", errors);
+                req.flash("oldData", req.body);
+                return keepQueryAndRedirect(req, false, "Validation failed. Please check the required fields.");
+            }
 
-      req.flash("success", "Owner updated successfully!");
-      res.redirect("/owners");
-    } catch (err) {
-      console.error(err);
-      return rejectOwner(req, req.body, "Error updating owner");
-    }
-  },
+            const email = req.body.email?.trim();
 
-  /* DELETE */
-  deleteOwner: async (req, res) => {
-    try {
-      const owner = await Owner.findById(req.params.id);
+            // 2. Duplicate Email Error
+            if (await uniqueEmail(email, owner._id)) {
+                if (req.file) deleteFile(req.file.filename);
+                return keepQueryAndRedirect(req, false, "Email already exists");
+            }
 
-      if (!owner) return rejectOwner(req, {}, "Owner not found");
+            let profileImage = owner.profileImage;
 
-      deleteFile(owner.profileImage);
-      await Owner.findByIdAndDelete(req.params.id);
+            if (req.file) {
+                // New file upload: delete old file and use new filename
+                deleteFile(owner.profileImage);
+                profileImage = req.file.filename;
+            } else if (req.body.cameraImage && req.body.cameraImage !== 'false') {
+                // New camera image: delete old photo and save base64
+                deleteFile(owner.profileImage);
+                profileImage = saveBase64Image(req.body.cameraImage);
+            } else if (req.body.deleteImage === 'true') {
+                // Explicitly deleted image: delete file and set field to null
+                deleteFile(owner.profileImage);
+                profileImage = null;
+            }
 
-      req.flash("success", "Owner deleted successfully!");
-      res.redirect("/owners");
-    } catch (err) {
-      console.error(err);
-      return rejectOwner(req, {}, "Error deleting owner");
-    }
-  },
 
-  /* CAMERA UPLOAD */
-  cameraUpload: async (req, res) => {
-    try {
-      if (!req.file)
-        return res.status(400).json({ error: "No image uploaded" });
-      return res.json({ fileName: req.file.filename });
-    } catch (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Upload failed" });
-    }
-  },
+            const payload = {
+                ...req.body,
+                email,
+                profileImage,
+            };
+
+            await Owner.findByIdAndUpdate(req.params.id, payload);
+
+            // 3. Successful Update
+            return keepQueryAndRedirect(req, true, "Owner updated successfully!");
+        } catch (err) {
+            console.error(err);
+            // 4. Server Error on Update
+            return keepQueryAndRedirect(req, false, "Error updating owner");
+        }
+    },
+
+    /* DELETE */
+    deleteOwner: async (req, res) => {
+        try {
+            const owner = await Owner.findById(req.params.id);
+
+            // 1. Owner Not Found
+            if (!owner) return keepQueryAndRedirect(req, false, "Owner not found");
+
+            deleteFile(owner.profileImage);
+            await Owner.findByIdAndDelete(req.params.id);
+
+            // 2. Successful Delete
+            // Use the redirect helper to keep the user on the current page/search results
+            return keepQueryAndRedirect(req, true, "Owner deleted successfully!");
+
+        } catch (err) {
+            console.error(err);
+            // 3. Server Error on Delete
+            return keepQueryAndRedirect(req, false, "Error deleting owner");
+        }
+    },
+
+    /* CAMERA UPLOAD */
+    cameraUpload: async (req, res) => {
+        try {
+            // Note: This endpoint should ideally handle the saving of the base64/file, 
+            // but for simplicity based on the original code, we'll keep the response structure.
+            if (!req.file)
+                return res.status(400).json({ error: "No image uploaded" });
+            return res.json({ fileName: req.file.filename });
+        } catch (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Upload failed" });
+        }
+    },
 };
