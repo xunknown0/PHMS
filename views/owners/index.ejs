@@ -57,6 +57,7 @@
 <% ownersArray.forEach(owner => { %>
   <%- include('./ownerModal/editOwnerModal', { owner }) %>
   <%- include('./ownerModal/viewProfileImage', { owner }) %>
+    <%- include('./ownerModal/viewOwnerModal', { owner }) %>
 <% }) %>
 
 
@@ -160,7 +161,7 @@
                     class="d-block flex-shrink-0"
                   >
                     <img
-                      src="<%= o.profileImage ? '/uploads/' + o.profileImage : '/images/owner_user.png' %>"
+                      src="<%= o.profileImage ? '/uploads/' + o.profileImage : '/images/defaultUser.png' %>"
                       alt="<%= o.firstName %> Profile Photo"
                       class="rounded-circle border border-3 shadow-sm <%= o.status === 'Active' ? 'border-success' : 'border-danger' %>"
                       style="width: 70px; height: 70px; object-fit: cover"
@@ -169,10 +170,12 @@
                   
                   <div class="ms-3 flex-grow-1">
                     <h5 class="card-title fw-bold mb-0 text-dark"><%= o.firstName %> <%= o.lastName %></h5>
-                    <p class="card-text text-muted small mb-1">
-                      Owner ID: **#<%= o.ownerId %>**
-                    </p>
-                    
+                      <p class="card-text text-muted small mb-1">
+                      Owner ID:
+                      <span class="<%= o.status === 'Active' ? 'text-success' : 'text-danger' %> fw-bold">
+                        #<%= o.ownerId %>
+                      </span>
+                    </p>                
                     <div class="row g-2 mt-2">
                       <div class="col-12 col-md-6 d-flex align-items-center">
                           <span class="badge rounded-pill <%= statusBg %> <%= statusText %> fw-semibold py-2 px-3">

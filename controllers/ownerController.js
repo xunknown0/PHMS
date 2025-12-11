@@ -181,57 +181,70 @@ module.exports = {
     },
 
 
-    /* CREATE */
-    createOwner: async (req, res) => {
+/* CREATE OWNER */
+ createOwner: async (req, res) => {
         const errors = validateOwner(req.body);
-        
-        // 1. Validation Error
+
         if (errors.length) {
             if (req.file) deleteFile(req.file.filename);
             req.flash("errors", errors);
             req.flash("oldData", req.body);
-            // Redirect using the new helper. It uses the current page/search query.
-            return keepQueryAndRedirect(req, false, "Validation failed. Please check the required fields."); 
+            return res.redirect("back");
         }
-
-        let profileImage = req.body.cameraImage || (req.file && req.file.filename) || null;
 
         try {
             const email = req.body.email?.trim();
 
-            // 2. Duplicate Email Error
             if (await uniqueEmail(email)) {
                 if (req.file) deleteFile(req.file.filename);
-                return keepQueryAndRedirect(req, false, "Email already exists");
+                req.flash("error", "Email already exists");
+                return res.redirect("back");
             }
 
-            // If a camera image was provided, save the base64 string and get the filename
-            if (req.body.cameraImage) {
-                profileImage = saveBase64Image(req.body.cameraImage);
-                // Ensure to delete the temporary multer file if a camera image was provided
-                if (req.file) deleteFile(req.file.filename);
+            /* ------------------------------------------------------
+                FIXED IMAGE HANDLING
+            ------------------------------------------------------ */
+            let profileImage = null;
+
+            // CASE 1: Normal file upload
+            if (req.file) {
+                profileImage = req.file.filename;
             }
-            
+
+            // CASE 2: Base64 camera image
+            else if (req.body.cameraImage && req.body.cameraImage.startsWith("data:image")) {
+
+                const base64Data = req.body.cameraImage.replace(/^data:image\/\w+;base64,/, "");
+                const buffer = Buffer.from(base64Data, "base64");
+
+                const filename = `cam_${Date.now()}.png`;
+                const filePath = path.join(uploadPath, filename);
+
+                fs.writeFileSync(filePath, buffer);
+                profileImage = filename;
+            }
+
+            /* ------------------------------------------------------
+                SAVE OWNER
+            ------------------------------------------------------ */
             const payload = {
                 ...req.body,
                 email,
-                // Simple unique ID for ownerId
-                ownerId: Date.now().toString(36).toUpperCase(), 
+                ownerId: Date.now().toString(36).toUpperCase(),
                 profileImage,
             };
 
             await Owner.create(payload);
 
-            // 3. Successful Create
-            // Redirect without preserving page/limit/search, as the new owner is on page 1
             req.flash("success", "Owner added successfully!");
-            res.redirect("/owners");
+            return res.redirect("/owners");
 
         } catch (err) {
-            console.error(err);
+            console.error("Error creating owner:", err);
             if (req.file) deleteFile(req.file.filename);
-            // 4. Server Error on Create
-            return keepQueryAndRedirect(req, false, "Error creating owner");
+
+            req.flash("error", "Error creating owner");
+            return res.redirect("back");
         }
     },
 

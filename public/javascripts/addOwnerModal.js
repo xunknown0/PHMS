@@ -1,145 +1,93 @@
 /* ==========================================================
-   CAMERA + AUTO UPLOAD MODULE
+      ADD OWNER — CAMERA SCRIPT (Converted from Edit Version)
 ========================================================== */
 
-let cameraStream = null;
-let timerLoop    = null;
-let faceLoop     = null;
+let addCameraStream = null;
 
-let currentZoom   = 1;
-const AUTO_ZOOM_MAX = 2.4;
-const TARGET_FACE_RATIO = 0.32;
+/* ---------- Helper Getters ---------- */
+const videoAdd = () => document.getElementById("cameraStream");
+const timerAdd = () => document.getElementById("cameraTimer");
+const wrapperAdd = () => document.getElementById("cameraWrapper");
+const previewAdd = () => document.getElementById("previewImg");
+const inputCameraAdd = () => document.getElementById("cameraImage");
 
+/* ---------- 1. Start Camera ---------- */
+async function startCamera() {
+    wrapperAdd().classList.remove("d-none");
 
-/* Helpers */
-const $ = id => document.getElementById(id);
+    timerAdd().style.display = "none";
 
-const videoEl  = () => $("cameraStream");
-const preview  = () => $("previewImg");
-const modal    = () => $("cameraWrapper");
-const timerUI  = () => $("cameraTimer");
-
-
-/* File Picker Preview */
-function loadOwnerImage(e){
-  const f = e.target.files?.[0];
-  if (f) preview().src = URL.createObjectURL(f);
-}
-
-
-/* Start Camera */
-async function startCamera(){
-  try{
-    modal().classList.remove("d-none");
-
-    cameraStream = await navigator.mediaDevices.getUserMedia({ video:true });
-    videoEl().srcObject = cameraStream;
-
-    startFaceZoomLoop();
-  }
-  catch(err){
-    alert("Camera unavailable or permission denied.");
-  }
-}
-
-
-/* Stop Camera */
-function stopCamera(){
-  modal().classList.add("d-none");
-
-  clearInterval(timerLoop);
-  clearInterval(faceLoop);
-
-  videoEl().style.transform = "scale(1)";
-  currentZoom = 1;
-
-  cameraStream?.getTracks().forEach(t=>t.stop());
-  cameraStream = null;
-}
-
-
-/* Auto Zoom Using FaceDetector (if supported) */
-function startFaceZoomLoop(){
-
-  if (!("FaceDetector" in window)) return;
-  const detector = new FaceDetector({ fastMode:true });
-
-  faceLoop = setInterval(async ()=>{
-    const vid = videoEl();
-    if(!vid.videoWidth) return;
-
-    const faces = await detector.detect(vid);
-    if(!faces.length) return;
-
-    const box = faces[0].boundingBox;
-    const frame = vid.videoWidth * vid.videoHeight;
-    const face  = box.width * box.height;
-
-    let desired = Math.sqrt(TARGET_FACE_RATIO / (face / frame));
-    desired = Math.min(AUTO_ZOOM_MAX, Math.max(1, desired));
-    currentZoom = currentZoom * .85 + desired * .15;
-
-    vid.style.transform = `scale(${currentZoom})`;
-  }, 120);
-}
-
-
-/* MAIN CAPTURE */
-function performFullCapture(){
-  const vid = videoEl();
-  const canvas = document.createElement("canvas");
-
-  canvas.width  = vid.videoWidth;
-  canvas.height = vid.videoHeight;
-  canvas.getContext("2d").drawImage(vid,0,0);
-
-  const base64 = canvas.toDataURL("image/png");
-  preview().src = base64;
-
-  stopCamera();
-  uploadCameraImage(base64);        // <--- NEW
-}
-
-
-/* Upload to backend using FormData */
-async function uploadCameraImage(base64){
-
-  // convert to blob
-  const r   = await fetch(base64);
-  const blob = await r.blob();
-
-  // create fake file
-  const file = new File([blob], "camera.png", { type: "image/png" });
-
-  const form = new FormData();
-  form.append("image", file);
-
-  const response = await fetch("/owners/camera-upload", {
-    method: "POST",
-    body: form
-  });
-
-  const result = await response.json();
-
-  $("cameraImage").value = result.fileName;  // store filename
-}
-
-
-/* COUNTDOWN */
-function capturePhotoWithTimer(){
-  let sec = 3;
-
-  timerUI().innerText = sec;
-  timerUI().style.display = "block";
-
-  timerLoop = setInterval(()=>{
-    sec--;
-    timerUI().innerText = sec;
-
-    if(sec <= 0){
-      clearInterval(timerLoop);
-      timerUI().style.display = "none";
-      performFullCapture();
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        addCameraStream = stream;
+        videoAdd().srcObject = stream;
+    } catch (err) {
+        console.error("Camera error:", err);
+        alert("Camera unavailable or permission denied.");
+        stopCamera();
     }
-  },1000);
+}
+
+/* ---------- 2. Stop Camera ---------- */
+function stopCamera() {
+    if (addCameraStream) {
+        addCameraStream.getTracks().forEach(t => t.stop());
+        addCameraStream = null;
+    }
+    wrapperAdd().classList.add("d-none");
+}
+
+/* ---------- 3. Capture Photo ---------- */
+function capturePhoto() {
+    const video = videoAdd();
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Draw frame
+    canvas.getContext("2d").drawImage(video, 0, 0);
+
+    const base64 = canvas.toDataURL("image/jpeg", 0.9);
+
+    previewAdd().src = base64;
+    inputCameraAdd().value = base64;
+
+    stopCamera();
+}
+
+/* ---------- 4. Countdown Capture ---------- */
+function capturePhotoWithTimer() {
+    let count = 3;
+
+    timerAdd().textContent = count;
+    timerAdd().style.display = "block";
+
+    const interval = setInterval(() => {
+        count--;
+
+        if (count > 0) {
+            timerAdd().textContent = count;
+        } else if (count === 0) {
+            timerAdd().textContent = "Capture!";
+        } else {
+            clearInterval(interval);
+            timerAdd().style.display = "none";
+            capturePhoto();
+        }
+    }, 1000);
+}
+
+/* ---------- 5. File Picker Preview ---------- */
+function loadOwnerImage(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    previewAdd().src = URL.createObjectURL(file);
+    inputCameraAdd().value = ""; // remove camera base64
+}
+
+/* ---------- 6. Auto-close camera on modal hide ---------- */
+const addOwnerModal = document.getElementById("addOwnerModal");
+if (addOwnerModal) {
+    addOwnerModal.addEventListener("hidden.bs.modal", stopCamera);
 }

@@ -42,7 +42,7 @@
           <!-- PROFILE IMAGE -->
           <div class="d-flex align-items-center mb-4 p-3 bg-light rounded-3 border">
             <img id="previewImg"
-                src="/uploads/default-user.png"
+                src="/images/defaultUser.png"
                 class="rounded-circle border border-4 me-3 shadow-sm"
                 style="width:90px;height:90px;object-fit:cover">
 
@@ -55,9 +55,8 @@
                               accept="image/*"
                               class="form-control"
                               onchange="loadOwnerImage(event)">
-                        <input type="hidden" id="cameraImage" name="cameraImage">
-
-                        <button type="button"
+                              <input type="hidden" id="cameraImage" name="cameraImage">
+                              <button type="button"
                                 class="btn btn-success"
                                 onclick="startCamera()">
                           <i class="fas fa-camera"></i>

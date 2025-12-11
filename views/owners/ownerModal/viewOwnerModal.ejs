@@ -1,30 +1,163 @@
-     <div class="small">
-                  <div class="d-flex align-items-center mb-1">
-                    <i class="fas fa-envelope me-2 text-success-emphasis" style="width: 15px;"></i> 
-                    <span class="text-dark"><%= o.email || 'N/A' %></span>
-                  </div>
-                  <div class="d-flex align-items-center mb-1">
-                    <i class="fas fa-phone me-2 text-success-emphasis" style="width: 15px;"></i> 
-                    <span class="text-dark"><%= o.phone || 'N/A' %></span>
-                  </div>
-                  <% if (o.phone2) { %>
-                    <div class="d-flex align-items-center mb-1 text-muted">
-                      <i class="fas fa-mobile-alt me-2" style="width: 15px;"></i> 
-                      <span><%= o.phone2 %> (Secondary)</span>
-                    </div>
-                  <% } %>
-                  
-                  <div class="d-flex align-items-start mb-2 text-muted">
-                    <i class="fas fa-map-marker-alt me-2 pt-1" style="width: 15px;"></i> 
-                    <span class="flex-grow-1"><%= o.address || 'Address not listed' %></span>
-                  </div>
-                    <div class="d-flex align-items-center mt-2">
-                  <i class="fas fa-paw me-2 text-success" style="width: 15px;"></i>
-                  <strong class="text-dark">
-                    <%= (o.petsCount || (o.pets ? o.pets.length : 0)) %>
-                  </strong>
-                  <span class="text-muted ms-1">
-                    Pet<%= (o.petsCount || (o.pets ? o.pets.length : 0)) !== 1 ? 's' : '' %>
+<% owners.forEach(owner => { %>
+<%
+  let viewImgSrc = owner.profileImage;
+  if (viewImgSrc && !viewImgSrc.startsWith('/uploads/')) {
+      viewImgSrc = '/uploads/' + viewImgSrc;
+  }
+
+  const ownerStatus = owner.status || 'Active';
+  const statusColorClass = ownerStatus === 'Active' ? 'success' : 'danger';
+  const petCount = owner.petsCount || (owner.pets ? owner.pets.length : 0);
+%>
+
+<div class="modal fade" id="viewOwnerModal-<%= owner._id %>" tabindex="-1" aria-labelledby="viewOwnerLabel-<%= owner._id %>" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content border-0 rounded-4 shadow-lg">
+
+      <!-- HEADER -->
+      <div class="modal-header bg-<%= statusColorClass %> text-white p-3 rounded-top-4 border-bottom-0">
+        <h5 class="modal-title fw-bold mb-0" id="viewOwnerLabel-<%= owner._id %>">
+          <i class="fas fa-user-circle me-2"></i> Owner Profile
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- BODY -->
+      <div class="modal-body p-4 p-md-5">
+
+        <div class="row g-4 g-lg-5">
+
+          <!-- LEFT COLUMN -->
+          <div class="col-lg-4 text-center border-end">
+
+            <div class="mb-4">
+              <img src="<%= viewImgSrc || '/images/owner_user.png' %>"
+                class="img-fluid rounded-circle shadow-lg border border-5 border-<%= statusColorClass %> p-1"
+                alt="Profile"
+                style="width: 180px; height: 180px; object-fit: cover;">
+            </div>
+
+            <h3 class="fw-bolder text-dark mb-1">
+              <%= owner.firstName %> <%= owner.lastName %>
+            </h3>
+
+            <p class="text-muted small mb-4">
+              Owner ID:
+              <span class="fw-semibold text-dark"><%= owner.ownerId %></span>
+            </p>
+
+            <div class="pt-4 border-top">
+
+              <!-- STATUS BADGE -->
+              <div class="mb-3">
+                <span class="badge rounded-pill bg-<%= statusColorClass %>-subtle text-<%= statusColorClass %> fw-bolder py-2 px-3 fs-6">
+                  <i class="fas fa-<%= ownerStatus === 'Active' ? 'check' : 'times' %>-circle me-1"></i>
+                  <%= ownerStatus %>
+                </span>
+              </div>
+
+              <!-- PET COUNT -->
+              <div class="p-3 bg-light rounded-4 border">
+                <h5 class="mb-0 fw-bold text-dark">
+                  <i class="fas fa-paw me-2 text-<%= statusColorClass %>"></i>
+                  <%= petCount %>
+                  <span class="small fw-normal text-muted">
+                    Pet<%= petCount !== 1 ? 's' : '' %> Registered
                   </span>
-                </div>
+                </h5>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN -->
+          <div class="col-lg-8">
+
+            <!-- PERSONAL INFORMATION -->
+            <div class="card mb-4 border-0 rounded-4 shadow-sm">
+              <div class="card-header bg-<%= statusColorClass %>-subtle text-<%= statusColorClass %> border-0 py-3 rounded-top-4">
+                <h6 class="fw-bold mb-0">
+                  <i class="fas fa-user me-2"></i> Personal Information
+                </h6>
+              </div>
+              <div class="card-body bg-white py-4">
+                <div class="row">
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Gender:</label>
+                    <p class="text-muted mb-0 fw-medium"><%= owner.gender || 'N/A' %></p>
                   </div>
+
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Birthdate:</label>
+                    <p class="text-muted mb-0 fw-medium">
+                      <%= owner.birthdate ? new Date(owner.birthdate).toISOString().substring(0,10) : 'N/A' %>
+                    </p>
+                  </div>
+
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Civil Status:</label>
+                    <p class="text-muted mb-0 fw-medium"><%= owner.civilStatus || 'N/A' %></p>
+                  </div>
+
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Email:</label>
+                    <p class="text-dark mb-0 fw-medium">
+                      <a href="mailto:<%= owner.email %>" class="text-decoration-none text-<%= statusColorClass %>">
+                        <%= owner.email || 'N/A' %>
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CONTACT INFORMATION -->
+            <div class="card border-0 rounded-4 shadow-sm">
+              <div class="card-header bg-<%= statusColorClass %>-subtle text-<%= statusColorClass %> border-0 py-3 rounded-top-4">
+                <h6 class="fw-bold mb-0">
+                  <i class="fas fa-phone me-2"></i> Contact Information
+                </h6>
+              </div>
+              <div class="card-body bg-white py-4">
+                <div class="row">
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Primary Number:</label>
+                    <p class="text-muted mb-0 fw-medium"><%= owner.phone || 'N/A' %></p>
+                  </div>
+
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Alternative Number:</label>
+                    <p class="text-muted mb-0 fw-medium"><%= owner.phone2 || 'N/A' %></p>
+                  </div>
+
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Emergency Contact Person:</label>
+                    <p class="text-muted mb-0 fw-medium"><%= owner.emergencyContactPerson || 'N/A' %></p>
+                  </div>
+
+                  <div class="col-sm-6 mb-3">
+                    <label class="fw-semibold text-dark small">Emergency Number:</label>
+                    <p class="text-muted mb-0 fw-medium"><%= owner.emergencyContactNumber || 'N/A' %></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div> <!-- end row -->
+
+      </div>
+
+      <!-- FOOTER -->
+      <div class="modal-footer justify-content-center border-top-0 pb-3">
+        <button type="button" class="btn btn-outline-secondary rounded-pill" data-bs-dismiss="modal">
+          Close Profile
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<% }) %>

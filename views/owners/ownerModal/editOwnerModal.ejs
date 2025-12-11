@@ -32,7 +32,7 @@
                 <% 
                   let imgSrc = owner.profileImage;
                   if (imgSrc && !imgSrc.startsWith('/uploads/') && !imgSrc.startsWith('data:image')) imgSrc = '/uploads/' + imgSrc;
-                  const defaultImg = '/images/owner_user.png';
+                  const defaultImg = '/uploads/defaultUser.png';
                 %>
 
                 <img id="previewEditImg-<%= owner._id %>"
