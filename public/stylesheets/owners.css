@@ -1,37 +1,72 @@
+/* =======================================
+   LAYOUT & ALIGNMENT UTILITIES (Ocean Dusk) 
+   ======================================= */
+
 .page-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:1.5rem;
+  /* Standard header layout */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
 }
 
-.page-title{display:flex;align-items:center;}
-
-.table-tools{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:1rem;
+.page-title {
+  /* Standard title alignment, usually includes an icon */
+  display: flex;
+  align-items: center;
 }
 
-.no-data{
-  text-align:center;
-  padding:2rem;
-  font-style:italic;
+.table-tools {
+  /* Container for search, filters, and action buttons above a table/list */
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Ensure vertical alignment of elements */
+  margin-bottom: 1rem;
 }
 
-.owner-thumb{
-  width:48px;
-  height:48px;
-  object-fit:cover;
+.no-data {
+  /* Style for when a list or table is empty */
+  text-align: center;
+  padding: 2rem;
+  font-style: italic;
+  color: #6c757d; /* Use a neutral Bootstrap grey for muted text */
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  background-color: #f8f9fa;
 }
 
-.hidden-lg{
-  max-width:250px;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  overflow:hidden;
+/* =======================================
+   IMAGE & TRUNCATION UTILITIES
+   ======================================= */
+
+.owner-thumb {
+  /* Thumbnail size for owner/profile pictures */
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  /* Optional: Standardize to circle for clean look, if not using hex */
+  /* border-radius: 50%; */ 
+  /* border: 2px solid var(--phms-blue); */
 }
+
+/* Truncation utility for hiding long text on small screens */
+.hidden-lg { 
+  max-width: 250px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  display: block; /* Required for width and overflow properties to work correctly */
+}
+
+/* =======================================
+   AVATAR SHAPE (Geometric)
+   ======================================= */
+
+/* NOTE: Hexagons are highly specific. If you prefer a clean look 
+   aligned with the rest of the new theme, consider using standard 
+   'border-radius: 50%;' instead. */
 .avatar-hex {
+  /* Using the original hexagon clip-path definition */
   -webkit-clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
   clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
 }

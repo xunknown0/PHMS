@@ -1,92 +1,118 @@
-   :root {
-      --phms-green: #284d3b;
-      --phms-dark-green: #1a3627;
-      --phms-golden: #c9b078;
-      --phms-card-bg: #ffffff;
-      --phms-shadow: 0 15px 40px rgba(0,0,0,0.3);
-      --phms-toast-success-bg: #1a753c;
-      --phms-toast-error-bg: #be0c0c;
-    }
+/* =======================================
+   ROOT VARIABLES (Ocean Dusk Theme) 
+   ======================================= */
+:root {
+  /* Ocean Dusk Palette */
+  --phms-blue: #2c3e50; 	 	     /* Primary: Deep Charcoal Blue (Replaces green) */
+  --phms-dark-blue: #1c2733; 	   /* Dark: Very Dark Blue/Black (Replaces dark-green) */
+  --phms-silver-accent: #bdc3c7; /* Accent: Soft Silver/Light Grey (Replaces golden) */
+  
+  --phms-card-bg: #ffffff;
+  --phms-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  
+  /* Contrast and Messaging Colors */
+  --phms-teal-contrast: #4ECDC4; 	  /* Bright Teal for Success (Replaces the success green color) */
+  --phms-toast-error-bg: #be0c0c;   /* Strong Red for Errors (Kept as standard) */
+}
 
-    body {
-      background-color: #e0e8e0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-    }
+body {
+  /* Soft grey/blue background for Ocean Dusk theme */
+  background-color: #e6e9ed; 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
-    /* Login Card */
-    .login-card {
-      background-color: var(--phms-card-bg);
-      width: 100%;
-      max-width: 400px;
-      padding: 3rem;
-      border-radius: 1rem;
-      box-shadow: var(--phms-shadow);
-      text-align: center;
-      border-top: 5px solid var(--phms-green);
-    }
+/* =======================================
+   LOGIN CARD
+   ======================================= */
+.login-card {
+  background-color: var(--phms-card-bg);
+  width: 100%;
+  max-width: 400px;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: var(--phms-shadow);
+  text-align: center;
+  /* Top border uses the new primary blue */
+  border-top: 5px solid var(--phms-blue);
+}
 
-    .login-card h2 {
-      color: var(--phms-dark-green);
-      margin-bottom: 2rem;
-      font-weight: 700;
-      font-size: 1.8rem;
-    }
+.login-card h2 {
+  /* Heading uses the dark blue for deep contrast */
+  color: var(--phms-dark-blue);
+  margin-bottom: 2rem;
+  font-weight: 700;
+  font-size: 1.8rem;
+}
 
-    .form-control {
-      border-radius: 0.5rem;
-      padding: 0.75rem 1rem;
-      border: 1px solid #ced4da;
-    }
+.form-control {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ced4da;
+}
 
-    .form-control:focus {
-      border-color: var(--phms-green);
-      box-shadow: 0 0 0 0.25rem rgba(40,77,59,0.25);
-    }
+.form-control:focus {
+  /* Focus border uses the new primary blue */
+  border-color: var(--phms-blue);
+  /* Focus shadow uses the new primary blue */
+  box-shadow: 0 0 0 0.25rem rgba(44,62,80,0.25); /* #2c3e50 with opacity */
+}
 
-    .btn-primary-phms {
-      background-color: var(--phms-green);
-      border-color: var(--phms-green);
-      color: #fff;
-      font-weight: 600;
-      padding: 0.75rem 1rem;
-      transition: all 0.3s ease;
-    }
+/* =======================================
+   PRIMARY BUTTON
+   ======================================= */
+.btn-primary-phms {
+  /* Button BG uses the new primary blue */
+  background-color: var(--phms-blue);
+  border-color: var(--phms-blue);
+  color: #fff;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
 
-    .btn-primary-phms:hover {
-      background-color: var(--phms-dark-green);
-      border-color: var(--phms-dark-green);
-      color: #fff;
-    }
+.btn-primary-phms:hover {
+  /* Hover BG uses the new dark blue */
+  background-color: var(--phms-dark-blue);
+  border-color: var(--phms-dark-blue);
+  color: #fff;
+}
 
-    .phms-golden-text {
-      color: var(--phms-golden) !important;
-    }
+/* =======================================
+   GOLDEN TEXT CLASS (Updated to Silver)
+   ======================================= */
+.phms-golden-text {
+  /* Uses the new silver accent color */
+  color: var(--phms-silver-accent) !important;
+}
 
-    /* Toasts */
-    #toast-container {
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      z-index: 1100;
-      padding: 1rem;
-    }
+/* =======================================
+   TOASTS / MESSAGING
+   ======================================= */
+#toast-container {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  z-index: 1100;
+  padding: 1rem;
+}
 
-    .toast.text-bg-success {
-      background-color: var(--phms-toast-success-bg) !important;
-      color: #fff !important;
-      border: none;
-      text-align: center;
-    }
+.toast.text-bg-success {
+  /* Success toast uses the new teal contrast color */
+  background-color: var(--phms-teal-contrast) !important;
+  color: var(--phms-dark-blue) !important; /* Dark text for contrast on bright teal */
+  border: none;
+  text-align: center;
+}
 
-    .toast.text-bg-danger {
-      background-color: var(--phms-toast-error-bg) !important;
-      color: #fff !important;
-      border: none;
-      text-align: center;
-
-    }
+.toast.text-bg-danger {
+  /* Error toast remains the strong red */
+  background-color: var(--phms-toast-error-bg) !important;
+  color: #fff !important;
+  border: none;
+  text-align: center;
+}

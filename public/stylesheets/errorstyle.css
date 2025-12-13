@@ -1,9 +1,12 @@
+/* =======================================
+   ROOT VARIABLES (Ocean Dusk Error Page) 
+   ======================================= */
 :root {
-  --primary-green: #284d3b;
-  --error-red: #c9b078;
-  --text-golden: #c9b078;
+  --primary-blue: #2c3e50; 	 /* Primary: Deep Charcoal Blue */
+  --error-red: #e74c3c; 	 /* High Impact Error Red */
+  --text-silver: #bdc3c7; 	 /* Accent: Soft Silver/Light Grey */
   --card-bg: #ffffff;
-  --card-border: var(--primary-green);
+  --card-border: var(--primary-blue);
 }
 
 body {
@@ -13,19 +16,24 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: var(--primary-green);
-  color: var(--text-golden);
+  /* Body background is the primary blue */
+  background: var(--primary-blue);
+  /* Body text color is the silver accent */
+  color: var(--text-silver);
   text-align: center;
   padding: 2rem;
   position: relative;
   overflow: hidden;
 }
 
-/* Decorative & animated paw prints */
+/* =======================================
+   DECORATIVE PAW PRINTS
+   ======================================= */
 .paw-print {
   position: absolute;
   font-size: 5rem;
-  color: rgba(255, 255, 255, 0.47);
+  /* Paw prints are a subtle white/silver */
+  color: rgba(255, 255, 255, 0.4); 
   pointer-events: none;
   animation: float 6s infinite ease-in-out alternate;
 }
@@ -49,9 +57,13 @@ body {
   align-items: center;
 }
 
+/* =======================================
+   ERROR HEADER & CARD
+   ======================================= */
 .error-header {
   font-size: 8rem;
   font-weight: 900;
+  /* Large error number uses the bold error red */
   color: var(--error-red);
   margin-bottom: 1rem;
   line-height: 1;
@@ -60,6 +72,7 @@ body {
 .error-card {
   background: var(--card-bg);
   border-radius: 1rem;
+  /* Border uses the primary blue */
   border: 4px solid var(--card-border);
   box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   padding: 2.5rem;
@@ -69,7 +82,8 @@ body {
 }
 
 .error-card h2 {
-  color: var(--primary-green);
+  /* Heading uses the primary blue */
+  color: var(--primary-blue);
   font-size: 1.8rem;
   margin-bottom: 1rem;
   display: flex;
@@ -85,18 +99,24 @@ body {
 
 .details-section {
   background-color: #f1f1f1;
+  /* Detail border uses the bold error red */
   border-left: 5px solid var(--error-red);
   padding: 1rem;
   border-radius: 0.5rem;
   font-family: monospace;
   font-size: 0.8rem;
-  color: #af0000;
+  /* Detail text color is a muted error red */
+  color: #c0392b; 
   margin-bottom: 1.5rem;
   text-align: left;
 }
 
+/* =======================================
+   PRIMARY BUTTON
+   ======================================= */
 .btn-phms {
-  background-color: var(--primary-green);
+  /* Button uses the primary blue */
+  background-color: var(--primary-blue);
   color: #fff;
   font-weight: bold;
   padding: 0.7rem 1.8rem;
@@ -109,12 +129,18 @@ body {
   font-size: 1.1rem;
   border: none;
 }
+
 .btn-phms:hover {
-  background-color: #3e7354;
+  /* Darker blue hover for depth */
+  background-color: #1c2733; 
   transform: translateY(-3px);
-  box-shadow: 0 4px 10px rgba(40, 77, 59, 0.3);
+  /* Box shadow uses the primary blue with opacity */
+  box-shadow: 0 4px 10px rgba(44, 62, 80, 0.3);
 }
 
+/* =======================================
+   RESPONSIVENESS
+   ======================================= */
 @media (max-width: 576px) {
   .error-header { font-size: 6rem; }
   .error-card { padding: 1.5rem; }

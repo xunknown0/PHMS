@@ -36,21 +36,22 @@
 
 <header class="d-flex justify-content-between align-items-center mb-4 pt-2">
   <div>
-    <h1 class="display-6 fw-bolder mb-1 text-dark fs-3">
-      <i class="fas fa-address-book me-2 text-success"></i> Owner Records
+    <h1 class="display-6 fw-bolder mb-1 text-dark fs-3 ">
+      <i class="fas fa-address-book me-2 style="color: #2c3e50;"></i> Owner Records
     </h1>
     <p class="text-muted fs-6 mb-0">Manage all registered pet owner profiles.</p>
   </div>
 
-  <button
-    type="button"
-    class="btn btn-success fw-bold text-uppercase px-4 py-2 shadow-lg"
-    data-bs-toggle="modal"
-    data-bs-target="#addOwnerModal"
-    title="Add a New Owner Record"
-  >
-    <i class="fas fa-user-plus me-2"></i> New Owner
-  </button>
+<button
+  type="button"
+  class="btn fw-bold text-uppercase px-4 py-2 shadow-lg"
+  style="background-color: #2c3e50; color: white;" 
+  data-bs-toggle="modal"
+  data-bs-target="#addOwnerModal"
+  title="Add a New Owner Record"
+>
+  <i class="fas fa-user-plus me-2"></i> New Owner
+</button>
 </header>
 
 <%- include('./ownerModal/addOwnerModal', { errorsList: errors, oldData: old }) %>
@@ -63,7 +64,7 @@
 
 <div class="card shadow-lg rounded-4 border-0">
   <div class="card-body p-4">
-    <div class="p-3 mb-4 rounded-4 bg-light border shadow-sm">
+    <div class="p-3 mb-4 bg-light border shadow-sm">
       <div class="row align-items-center g-3">
         <div class="col-12 col-lg-9">
           <form id="searchForm" method="GET" action="/owners" class="d-flex align-items-center gap-3">
@@ -77,19 +78,20 @@
                       <i class="fas fa-grip-lines small"></i> 
                   </span> 
                   
-                  <select 
-                    name="limit" 
-                    id="limit" 
-                    class="form-select border-0 ps-1 pe-3 bg-white text-success fw-bolder" 
-                    onchange="document.getElementById('searchForm').submit()"
-                  >
-                    <% [6, 9, 12, 18].forEach(limitVal => { %>
-                      <option value="<%= limitVal %>" <%= currentLimit == limitVal ? 'selected' : '' %>>
-                        <%= limitVal %>
-                      </option>
-                    <% }) %>
-                  </select>
-                  
+                 <select 
+                  name="limit" 
+                  id="limit" 
+                  class="form-select border-0 ps-1 pe-3 bg-white fw-bolder" 
+                  style="color: #2c3e50;"
+                  onchange="document.getElementById('searchForm').submit()"
+                >
+                  <% [6, 9, 12, 18].forEach(limitVal => { %>
+                    <option value="<%= limitVal %>" <%= currentLimit == limitVal ? 'selected' : '' %>>
+                      <%= limitVal %>
+                    </option>
+                  <% }) %>
+                </select>
+                                  
                   <label class="input-group-text bg-white border-0 text-muted d-none d-sm-flex small p-1 pe-3" for="limit">/ Page</label> 
               </div>
             <div class="input-group shadow-sm flex-grow-1 rounded-pill overflow-hidden bg-white">
@@ -103,7 +105,7 @@
                 placeholder="Search by name, ID, or phone..."
                 value="<%= currentSearch %>"
               />
-              <button class="btn btn-success" type="submit">Search</button>
+            <button class="btn" style="background-color: #2c3e50; color: white;" type="submit">Search</button>
             </div>
 
             <% if (currentSearch) { %>
@@ -120,7 +122,7 @@
           <small id="recordCountDisplay" class="text-muted fw-medium d-block text-center text-lg-end">
             <i class="fas fa-list-alt me-1"></i> Page <strong><%= currentPageNumber %></strong> of <strong><%= currentTotalPages %></strong>
             <% if (currentSearch) { %>
-              <span class="text-success ms-1 fst-italic fw-bold">(Filtered)</span>
+            <span class="ms-1 fst-italic fw-bold" style="color: #2c3e50;">(Filtered)</span>
             <% } %>
           </small>
         </div>

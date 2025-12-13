@@ -1,27 +1,35 @@
-/* --- PHMS Theme Variables for Cards --- */
+/* =======================================
+   PHMS Theme Variables (Ocean Dusk) 
+   ======================================= */
 :root {
-  --phms-primary-green: #284d3b;
-  --phms-dark-primary: #1a3627;
-  --phms-golden-accent: #c9b078;
+  /* Ocean Dusk Colors */
+  --phms-primary-blue: #2c3e50; 	   /* Primary: Deep Charcoal Blue */
+  --phms-dark-primary: #1c2733; 	   /* Dark: Very Dark Blue/Black */
+  --phms-silver-accent: #bdc3c7;     /* Accent: Soft Silver/Light Grey */
+  --phms-teal-contrast: #4ECDC4; 	   /* Contrast: Bright Teal (for success/active states) */
   --phms-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* =======================================
+   1. DARK CARD STYLES (for background elements)
+   ======================================= */
+
 .phms-card-dark {
-  background-color: var(--phms-primary-green);
+  background-color: var(--phms-primary-blue); /* Deep Charcoal Blue */
   color: white;
   border: 1px solid var(--phms-dark-primary);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .phms-card-dark:hover {
-  transform: translateY(-5px); /* Slight lift on hover */
+  transform: translateY(-5px); 
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 }
 
 .phms-card-dark .card-title {
-  color: var(--phms-golden-accent); /* Golden accent for titles */
+  color: var(--phms-silver-accent); /* Silver accent for titles */
   font-weight: 700;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15); /* Slightly clearer border */
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
 }
@@ -31,45 +39,56 @@
   opacity: 0.85;
 }
 
+/* =======================================
+   2. ACCENT BUTTON (Silver/Khaki equivalent)
+   ======================================= */
+
 /* Custom button that contrasts well with the dark card */
 .btn-outline-golden {
-  color: var(--phms-golden-accent);
-  border-color: var(--phms-golden-accent);
+  color: var(--phms-silver-accent);
+  border-color: var(--phms-silver-accent);
   background-color: transparent;
   font-weight: 600;
   transition: background-color 0.2s, color 0.2s;
 }
 
 .btn-outline-golden:hover {
-  background-color: var(--phms-golden-accent);
-  color: var(--phms-dark-primary); /* Dark text on hover */
-  border-color: var(--phms-golden-accent);
+  background-color: var(--phms-silver-accent);
+  color: var(--phms-dark-primary); /* Dark Blue text on hover */
+  border-color: var(--phms-silver-accent);
 }
 
+/* =======================================
+   3. PAGINATION (Updating Bootstrap Success Green to Teal Contrast)
+   ======================================= */
 
 .pagination-success .page-link {
-  color: #198754;
-  border-color: #198754;
+  color: var(--phms-teal-contrast); /* Bright Teal */
+  border-color: var(--phms-teal-contrast);
 }
 
 .pagination-success .page-link:hover {
-  background-color: #198754;
-  color: white;
+  background-color: var(--phms-teal-contrast);
+  color: var(--phms-dark-primary); /* Dark text for better contrast on teal background */
 }
 
 .pagination-success .active .page-link {
-  background-color: #198754;
-  border-color: #198754;
-  color: white;
+  background-color: var(--phms-teal-contrast);
+  border-color: var(--phms-teal-contrast);
+  color: var(--phms-dark-primary); /* Dark text for better contrast on teal background */
 }
 
 
+/* =======================================
+   4. OUTLINE BUTTON (Updating Bootstrap Success Green to Teal Contrast)
+   ======================================= */
+
 .btn-outline-phms-green {
-  color: #198754;
-  border-color: #198754;
+  color: var(--phms-teal-contrast);
+  border-color: var(--phms-teal-contrast);
 }
 
 .btn-outline-phms-green:hover {
-  background-color: #198754;
-  color: #fff;
+  background-color: var(--phms-teal-contrast);
+  color: white;
 }
